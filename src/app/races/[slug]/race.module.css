@@ -31,6 +31,54 @@
   color: var(--text-dim);
 }
 
+/* Query states (loading / error) — echo the start-lights loader look */
+.state {
+  min-height: 50vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+}
+
+.stateBadge {
+  font-family: var(--font-data);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-faint);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stateDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--surface-raised);
+}
+
+.state[data-variant="loading"] .stateDot {
+  animation: statePulse 1.2s infinite;
+}
+
+.state[data-variant="error"] .stateDot {
+  background: var(--accent);
+}
+
+@keyframes statePulse {
+  0%, 100% { background: var(--surface-raised); }
+  50% { background: var(--accent); }
+}
+
+.stateText {
+  max-width: 420px;
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
 /* Timing left, standings right; stacks on narrow screens */
 .grid {
   display: grid;

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import Header from "@/components/Header/Header";
 import "./globals.css";
+import QueryProvider from "./providers";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
@@ -19,7 +20,9 @@ export default function RootLayout({
     <html lang="uk" className={`${inter.variable} ${mono.variable}`}>
       <body>
         <Header />
-        <main>{children}</main>
+        <QueryProvider>
+          <main>{children}</main>
+        </QueryProvider>
       </body>
     </html>
   );
