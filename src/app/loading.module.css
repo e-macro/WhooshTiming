@@ -1,0 +1,35 @@
+/* Start-lights loader — five red lights, F1 start procedure */
+.wrap {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.lights {
+  display: flex;
+  gap: 10px;
+}
+
+.light {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--surface-raised);
+  animation: lightUp 1.6s infinite;
+}
+
+@keyframes lightUp {
+  0%, 100% { background: var(--surface-raised); }
+  30%, 70% { background: var(--accent); }
+}
+
+.label {
+  font-family: var(--font-data);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-faint);
+}

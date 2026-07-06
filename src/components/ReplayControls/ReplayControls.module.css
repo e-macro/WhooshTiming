@@ -1,0 +1,65 @@
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
+}
+
+.play {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  display: grid;
+  place-items: center;
+  transition: background 0.15s;
+}
+
+.play:hover {
+  background: var(--accent-hover);
+}
+
+.track {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-raised);
+  cursor: pointer;
+  position: relative;
+}
+
+.progress {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 3px;
+  background: var(--accent);
+}
+
+.time {
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+.speeds {
+  display: flex;
+  gap: 4px;
+}
+
+.speed {
+  padding: 4px 10px;
+  border-radius: var(--squircle-sm);
+  font-size: 12px;
+  color: var(--text-dim);
+  transition: color 0.15s, background 0.15s;
+}
+
+.speed:hover {
+  color: var(--text);
+}
+
+.active {
+  background: var(--surface-raised);
+  color: var(--text);
+}

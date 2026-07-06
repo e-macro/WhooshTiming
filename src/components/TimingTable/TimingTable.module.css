@@ -1,0 +1,74 @@
+.wrap {
+  overflow: hidden;
+  padding: 8px 0;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 96px 88px 110px;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.head {
+  font-family: var(--font-data);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--text-faint);
+  border-bottom: 1px solid var(--border);
+}
+
+.pos {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.driver {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* Team colour bar — the visual anchor of every row */
+.teamBar {
+  width: 4px;
+  height: 20px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.num {
+  color: var(--text-faint);
+  font-size: 12px;
+}
+
+.pit {
+  font-family: var(--font-data);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--pit);
+  border: 1px solid var(--pit);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+.right {
+  text-align: right;
+}
+
+.dim {
+  color: var(--text-dim);
+}
+
+/* Broadcast timing semantics */
+.fastest { color: var(--time-fastest); }
+.pb      { color: var(--time-pb); }
+.normal  { color: var(--text); }

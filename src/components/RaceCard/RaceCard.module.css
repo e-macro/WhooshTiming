@@ -1,0 +1,34 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.card:hover {
+  border-color: var(--text-faint);
+  background: var(--surface-raised);
+}
+
+.round {
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+}
+
+.name {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.meta {
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+.date {
+  margin-top: 6px;
+  color: var(--text-faint);
+  font-size: 12px;
+}

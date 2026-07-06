@@ -1,0 +1,60 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.block {
+  padding: 16px 0 8px;
+}
+
+.heading {
+  font-family: var(--font-data);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+  padding: 0 20px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 20px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.pos {
+  width: 18px;
+  color: var(--text-dim);
+}
+
+.teamBar {
+  width: 3px;
+  height: 16px;
+  border-radius: 2px;
+}
+
+.name {
+  flex: 1;
+  font-weight: 600;
+}
+
+.delta {
+  color: var(--time-pb);
+  font-size: 12px;
+}
+
+.points {
+  width: 44px;
+  text-align: right;
+  font-weight: 600;
+}
