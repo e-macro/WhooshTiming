@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  title: "PitWall — F1 Race Replay",
+  title: "ВЖЖЖТаймінг — Повтори F1 гонок",
   description:
     "Replay any Formula 1 session with live-style timing, theoretical standings and track data.",
 };
