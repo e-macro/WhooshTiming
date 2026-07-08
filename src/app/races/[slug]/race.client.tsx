@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { openf1 } from "@/lib/api/openf1";
 import { useReplayStore } from "@/store/replayStore";
 import { useEffect } from "react";
+import { useReplayTick } from "@/lib/hooks/useReplayTick";
 
 type Props = { sessionKey: string };
 
@@ -29,15 +30,18 @@ export default function RaceClient({ sessionKey }: Props) {
     queryKey: ['session', sessionKey],
     queryFn: () => openf1.session(Number(sessionKey)),
   })
+  useReplayTick()
   useEffect(() => {
     if (!session.data?.[0] || !positions.data) {
       return
     }
     const startMs = new Date(session.data[0].date_start).getTime()
     const endMs = positions.data.reduce((acc, n) => Math.max(acc, new Date(n.date).getTime()), 0)
+    if(endMs === 0) {
+      return
+    }
     const duration = endMs - startMs;
     setDuration(duration);
-    
   }, [setDuration, session.data, positions.data])
   if (drivers.isPending || positions.isPending || laps.isPending || session.isPending) {
     return (
