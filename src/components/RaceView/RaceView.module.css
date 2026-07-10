@@ -26,11 +26,6 @@
   font-weight: 700;
 }
 
-.lap {
-  font-size: 15px;
-  color: var(--text-dim);
-}
-
 .grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;

@@ -70,3 +70,20 @@ export function buildSessionBest(completedLaps: CompletedLap[], startMs: number)
     }
     return result
 }
+
+export function buildLapMilestones(completedLaps: CompletedLap[], startMs: number): {t: number, lapNumber: number}[] {
+    const points = completedLaps.map(l => ({
+        t: new Date(l.date_start).getTime() + l.lap_duration * 1000 - startMs,
+        lapNumber: l.lap_number
+    }))
+    points.sort((a, b) => a.t - b.t)
+    const laps: {t: number, lapNumber: number}[] = []
+    let maxLap  = 0
+    for (const p of points) {
+        if (p.lapNumber > maxLap) {
+            maxLap = p.lapNumber
+            laps.push({t: p.t, lapNumber: p.lapNumber})
+        }
+    }
+    return laps
+}

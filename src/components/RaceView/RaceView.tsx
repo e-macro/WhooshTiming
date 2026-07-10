@@ -4,6 +4,7 @@ import ReplayControls from '../ReplayControls/ReplayControls';
 import TimingTable from '../TimingTable/TimingTable';
 import StandingsSidebar from '../StandingsSidebar/StandingsSidebar';
 import { useSessionIndexes } from '@/lib/hooks/useSessionIndexes';
+import LapCounter from '../LapCounter/LapCounter';
 
 type Props = {
     drivers: Driver[],
@@ -16,7 +17,7 @@ type Props = {
 }
 
 const RaceView = ({drivers, positions, intervals, laps, sessionStartMs, totalLaps, sessionKey}: Props) => {
-    const { positionIndex, intervalIndex, lapIndex, sessionBest } = useSessionIndexes(positions, intervals, laps, sessionStartMs)
+    const { positionIndex, intervalIndex, lapIndex, sessionBest, completedLaps } = useSessionIndexes(positions, intervals, laps, sessionStartMs)
     return (
     <div className={styles.page}>
         <header className={styles.head}>
@@ -27,7 +28,7 @@ const RaceView = ({drivers, positions, intervals, laps, sessionStartMs, totalLap
             </h1>
         </div>
         {/* TODO: lap counter — current lap / total from replay cursor */}
-        <span className={`${styles.lap} tnum`}>LAP 32 / {totalLaps}</span>
+        <LapCounter completedLaps={completedLaps} sessionStartMs={sessionStartMs} totalLaps={totalLaps}/>
         </header>
 
         <ReplayControls />
