@@ -3,7 +3,7 @@
 import { useReplayStore } from "@/store/replayStore";
 import styles from "./ReplayControls.module.css";
 import { formatTime } from "@/lib/format";
-import { useRef, type ReactEventHandler } from "react";
+import { useRef } from "react";
 
 const SPEEDS = [1, 10, 30] as const;
 

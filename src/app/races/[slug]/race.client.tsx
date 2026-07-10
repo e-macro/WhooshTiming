@@ -65,9 +65,8 @@ export default function RaceClient({ sessionKey }: Props) {
       </div>
     );
   }
-  
+  const startMs = new Date(session.data[0].date_start).getTime()
   const totalLaps = laps.data.reduce((acc, n) => Math.max(acc, n.lap_number), 0)
-  // TODO: feed loaded data into replay store (src/store/replayStore.ts)
   return (
     <div className={styles.page}>
       <header className={styles.head}>
@@ -83,7 +82,7 @@ export default function RaceClient({ sessionKey }: Props) {
 
       <ReplayControls />
       <div className={styles.grid}>
-        <TimingTable />
+        <TimingTable drivers={drivers.data} positions={positions.data} sessionStartMs={startMs}/>
         <StandingsSidebar />
       </div>
     </div>
