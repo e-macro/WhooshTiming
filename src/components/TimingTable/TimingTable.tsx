@@ -17,6 +17,7 @@ type TimingRow = {
   lastLap: string;
   lapState: "fastest" | "pb" | "normal";
   inPit: boolean;
+  isOut: boolean
 };
 
 type Props = {
@@ -25,9 +26,12 @@ type Props = {
   intervalIndex: ReturnType<typeof useSessionIndexes>['intervalIndex'],
   lapIndex: ReturnType<typeof useSessionIndexes>['lapIndex'],
   sessionBest: ReturnType<typeof useSessionIndexes>['sessionBest']
+  pitIndex: ReturnType<typeof useSessionIndexes>['pitIndex']
 }
 
-export default function TimingTable({drivers, positionIndex, intervalIndex, lapIndex, sessionBest}: Props) {
+const OUT_THRESHOLD_MS = 180000
+
+export default function TimingTable({drivers, positionIndex, intervalIndex, lapIndex, pitIndex, sessionBest}: Props) {
   const cursor = useReplayStore(s => s.cursor)
   const rec = searchLatest(sessionBest, cursor)
   const rows: TimingRow[] = []
@@ -35,25 +39,34 @@ export default function TimingTable({drivers, positionIndex, intervalIndex, lapI
     const point = latestAt(positionIndex, driver.driver_number, cursor)
     const time = latestAt(intervalIndex, driver.driver_number, cursor) 
     const lap = latestAt(lapIndex, driver.driver_number, cursor)
+    const pit = latestAt(pitIndex, driver.driver_number, cursor)
     if (point === null) {
         continue
     }
+    const allLaps = lapIndex.get(driver.driver_number)
+    const lastLap = allLaps?.[allLaps.length - 1]
+    const lastActivity = lastLap?.t ?? 0
+    const isOut = cursor - lastActivity > OUT_THRESHOLD_MS
     rows.push({ 
       position: point.position,
       driverNumber: driver.driver_number, 
       acronym: driver.name_acronym, 
       teamColor: `#${driver.team_colour}`,
-      gap: point.position === 1 ? 'LEADER' : formatGap(time?.gap ?? null, '-'),
-      interval: point.position === 1 ? '-' : formatGap(time?.interval ?? null, '-'),
+      gap: point.position === 1 ? 'LEADER' 
+          : isOut ? 'OUT'
+          : formatGap(time?.gap ?? null, '-'),
+      interval: point.position === 1 ? '-' 
+              : isOut ? '-'
+              : formatGap(time?.interval ?? null, '-'),
       lastLap: lap ? formatLapTime(lap.duration) : '-',
       lapState: lap && rec && lap.duration <= rec.best ? 'fastest'
               : lap?.isPb ? 'pb'
               : 'normal',
-      inPit: false,
+      inPit: pit !== null && cursor <= pit.t + pit.pitDuration * 1000,
+      isOut
     })
   }
-  rows.sort((a, b) => a.position - b.position)
-  // TODO Later: DNF/DNS (or more united for both cases - OUT) row for any driver who is not participating in race in a certain timestamp
+  rows.sort((a, b) => Number(a.isOut) - Number(b.isOut) || a.position - b.position)
   return (
     <section className={`card ${styles.wrap}`} aria-label="Live timing">
       <div className={`${styles.row} ${styles.head}`}>
@@ -65,7 +78,7 @@ export default function TimingTable({drivers, positionIndex, intervalIndex, lapI
       </div>
 
       {rows.map((row) => (
-        <div key={row.driverNumber} className={styles.row}>
+        <div key={row.driverNumber} className={styles.row} data-out={row.isOut}>
           <span className={`${styles.pos} tnum`}>{row.position}</span>
           <span className={styles.driver}>
             <i className={styles.teamBar} style={{ background: row.teamColor }} />

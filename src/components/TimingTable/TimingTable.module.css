@@ -60,6 +60,23 @@
   padding: 1px 5px;
 }
 
+/* Retired driver (DNF/DNS) — whole row fades, colours desaturate */
+.row[data-out="true"] {
+  color: var(--text-faint);
+}
+
+.row[data-out="true"] .pos,
+.row[data-out="true"] .driver b,
+.row[data-out="true"] .fastest,
+.row[data-out="true"] .pb,
+.row[data-out="true"] .normal {
+  color: var(--text-faint);
+}
+
+.row[data-out="true"] .teamBar {
+  opacity: 0.35;
+}
+
 .right {
   text-align: right;
 }

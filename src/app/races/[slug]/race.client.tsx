@@ -32,6 +32,10 @@ export default function RaceClient({ sessionKey }: Props) {
     queryKey: ['intervals', sessionKey],
     queryFn: () => openf1.intervals(Number(sessionKey)),
   })
+  const pits = useQuery({
+    queryKey: ['pits', sessionKey],
+    queryFn: () => openf1.pits(Number(sessionKey)),
+  })
   useReplayTick()
   useEffect(() => {
     if (!session.data?.[0] || !positions.data) {
@@ -46,7 +50,7 @@ export default function RaceClient({ sessionKey }: Props) {
     setDuration(duration);
   }, [setDuration, session.data, positions.data])
 
-  if (drivers.isPending || positions.isPending || laps.isPending || session.isPending || intervals.isPending) {
+  if (drivers.isPending || positions.isPending || laps.isPending || session.isPending || intervals.isPending || pits.isPending) {
     return (
       <div className={styles.state} data-variant="loading" role="status">
         <span className={styles.stateBadge}>
@@ -57,7 +61,7 @@ export default function RaceClient({ sessionKey }: Props) {
       </div>
     );
   }
-  if (drivers.isError || positions.isError || laps.isError || session.isError || intervals.isError) {
+  if (drivers.isError || positions.isError || laps.isError || session.isError || intervals.isError || pits.isError) {
     return (
       <div className={styles.state} data-variant="error" role="alert">
         <span className={styles.stateBadge}>
@@ -78,6 +82,7 @@ export default function RaceClient({ sessionKey }: Props) {
     sessionKey={sessionKey} 
     totalLaps={totalLaps} 
     sessionStartMs={startMs}
-    laps={laps.data}/>
+    laps={laps.data}
+    pits={pits.data}/>
   );
 }

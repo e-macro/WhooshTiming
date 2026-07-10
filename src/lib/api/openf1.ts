@@ -1,5 +1,6 @@
 import type {
   Meeting, Session, Driver, Position, Interval, Lap,
+  Pit,
 } from "@/lib/types/openf1";
 
 const BASE = "https://api.openf1.org/v1";
@@ -26,7 +27,8 @@ export const openf1 = {
   positions: (sessionKey: number) => get<Position>("position", { session_key: sessionKey }),
   intervals: (sessionKey: number) => get<Interval>("intervals", { session_key: sessionKey }),
   laps: (sessionKey: number) => get<Lap>("laps", { session_key: sessionKey }),
-  session: (sessionKey: number) => get<Session>("sessions", { session_key: sessionKey })
+  session: (sessionKey: number) => get<Session>("sessions", { session_key: sessionKey }),
+  pits: (sessionKey: number) => get<Pit>('pit', {session_key: sessionKey})
   // NOTE: /v1/location is huge (~0.5M records per race).
   // Fetch in time windows (date>=...&date<=...) — never all at once.
 };
