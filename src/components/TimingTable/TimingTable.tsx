@@ -2,7 +2,7 @@
 
 import type { Driver, Position } from "@/lib/types/openf1";
 import styles from "./TimingTable.module.css";
-import { buildPositionIndex, positionAt } from "@/lib/replay/positions";
+import { buildTimeIndex, latestAt } from "@/lib/replay/timeIndex";
 import { useMemo } from "react";
 import { useReplayStore } from "@/store/replayStore";
 
@@ -25,16 +25,16 @@ type Props = {
 }
 
 export default function TimingTable({drivers, positions, sessionStartMs}: Props) {
-  const index = useMemo(() => buildPositionIndex(positions, sessionStartMs), [positions, sessionStartMs])
+  const index = useMemo(() => buildTimeIndex(positions, sessionStartMs, r => ({position: r.position})), [positions, sessionStartMs])
   const cursor = useReplayStore(s => s.cursor)
   const rows: TimingRow[] = []
   for (const driver of drivers) {
-    const position = positionAt(index, driver.driver_number, cursor) 
-    if (position === null) {
+    const point = latestAt(index, driver.driver_number, cursor)    
+    if (point === null) {
         continue
     }
     rows.push({ 
-      position, 
+      position: point.position,
       driverNumber: driver.driver_number, 
       acronym: driver.name_acronym, 
       teamColor: `#${driver.team_colour}`,
