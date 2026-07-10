@@ -1,14 +1,12 @@
 "use client";
 
-import ReplayControls from "@/components/ReplayControls/ReplayControls";
-import TimingTable from "@/components/TimingTable/TimingTable";
-import StandingsSidebar from "@/components/StandingsSidebar/StandingsSidebar";
 import styles from "./race.module.css";
 import { useQuery } from "@tanstack/react-query";
 import { openf1 } from "@/lib/api/openf1";
 import { useReplayStore } from "@/store/replayStore";
 import { useEffect } from "react";
 import { useReplayTick } from "@/lib/hooks/useReplayTick";
+import RaceView from "@/components/RaceView/RaceView";
 
 type Props = { sessionKey: string };
 
@@ -47,6 +45,7 @@ export default function RaceClient({ sessionKey }: Props) {
     const duration = endMs - startMs;
     setDuration(duration);
   }, [setDuration, session.data, positions.data])
+
   if (drivers.isPending || positions.isPending || laps.isPending || session.isPending || intervals.isPending) {
     return (
       <div className={styles.state} data-variant="loading" role="status">
@@ -72,23 +71,13 @@ export default function RaceClient({ sessionKey }: Props) {
   const startMs = new Date(session.data[0].date_start).getTime()
   const totalLaps = laps.data.reduce((acc, n) => Math.max(acc, n.lap_number), 0)
   return (
-    <div className={styles.page}>
-      <header className={styles.head}>
-        <div>
-          <p className={styles.eyebrow}>Race replay</p>
-          <h1 className={styles.title}>
-            Session <span className="tnum">#{sessionKey}</span>
-          </h1>
-        </div>
-        {/* TODO: lap counter — current lap / total from replay cursor */}
-        <span className={`${styles.lap} tnum`}>LAP 32 / {totalLaps}</span>
-      </header>
-
-      <ReplayControls />
-      <div className={styles.grid}>
-        <TimingTable drivers={drivers.data} positions={positions.data} sessionStartMs={startMs} intervals={intervals.data} laps={laps.data}/>
-        <StandingsSidebar />
-      </div>
-    </div>
+    <RaceView 
+    drivers={drivers.data}
+    positions={positions.data} 
+    intervals={intervals.data} 
+    sessionKey={sessionKey} 
+    totalLaps={totalLaps} 
+    sessionStartMs={startMs}
+    laps={laps.data}/>
   );
 }

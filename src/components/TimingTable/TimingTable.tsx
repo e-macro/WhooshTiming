@@ -1,11 +1,11 @@
 "use client";
 
-import type { Driver, Interval, Lap, Position } from "@/lib/types/openf1";
+import type { Driver } from "@/lib/types/openf1";
 import styles from "./TimingTable.module.css";
-import { annotatePb, buildSessionBest, buildTimeIndex, latestAt, searchLatest, type CompletedLap } from "@/lib/replay/timeIndex";
-import { useMemo } from "react";
+import { latestAt, searchLatest} from "@/lib/replay/timeIndex";
 import { useReplayStore } from "@/store/replayStore";
 import { formatGap, formatLapTime } from "@/lib/format";
+import type { useSessionIndexes } from "@/lib/hooks/useSessionIndexes";
 
 type TimingRow = {
   position: number;
@@ -21,22 +21,13 @@ type TimingRow = {
 
 type Props = {
   drivers: Driver[],
-  positions: Position[],
-  sessionStartMs: number
-  intervals: Interval[],
-  laps: Lap[]
+  positionIndex: ReturnType<typeof useSessionIndexes>['positionIndex'],
+  intervalIndex: ReturnType<typeof useSessionIndexes>['intervalIndex'],
+  lapIndex: ReturnType<typeof useSessionIndexes>['lapIndex'],
+  sessionBest: ReturnType<typeof useSessionIndexes>['sessionBest']
 }
 
-export default function TimingTable({drivers, positions, sessionStartMs, intervals, laps}: Props) {
-  const positionIndex = useMemo(() => buildTimeIndex(positions, sessionStartMs, r => ({position: r.position}), r => new Date(r.date).getTime()), [positions, sessionStartMs])
-  const intervalIndex = useMemo(() => buildTimeIndex(intervals, sessionStartMs, r => ({ gap: r.gap_to_leader, interval: r.interval}), r => new Date(r.date).getTime()), [intervals, sessionStartMs])
-  const completedLaps = useMemo(() => laps.filter((lap): lap is CompletedLap => lap.lap_duration !== null), [laps])
-  const lapIndex = useMemo(() => {
-    const idx = buildTimeIndex(completedLaps, sessionStartMs, r => ({duration: r.lap_duration, lapNumber: r.lap_number, isPb: false}), r => new Date(r.date_start).getTime() + r.lap_duration * 1000)
-    annotatePb(idx)
-    return idx
-  }, [completedLaps, sessionStartMs])
-  const sessionBest = useMemo(() => buildSessionBest(completedLaps, sessionStartMs), [completedLaps, sessionStartMs])
+export default function TimingTable({drivers, positionIndex, intervalIndex, lapIndex, sessionBest}: Props) {
   const cursor = useReplayStore(s => s.cursor)
   const rec = searchLatest(sessionBest, cursor)
   const rows: TimingRow[] = []
