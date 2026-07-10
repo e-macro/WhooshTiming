@@ -30,6 +30,10 @@ export default function RaceClient({ sessionKey }: Props) {
     queryKey: ['session', sessionKey],
     queryFn: () => openf1.session(Number(sessionKey)),
   })
+  const intervals = useQuery({
+    queryKey: ['intervals', sessionKey],
+    queryFn: () => openf1.intervals(Number(sessionKey)),
+  })
   useReplayTick()
   useEffect(() => {
     if (!session.data?.[0] || !positions.data) {
@@ -43,7 +47,7 @@ export default function RaceClient({ sessionKey }: Props) {
     const duration = endMs - startMs;
     setDuration(duration);
   }, [setDuration, session.data, positions.data])
-  if (drivers.isPending || positions.isPending || laps.isPending || session.isPending) {
+  if (drivers.isPending || positions.isPending || laps.isPending || session.isPending || intervals.isPending) {
     return (
       <div className={styles.state} data-variant="loading" role="status">
         <span className={styles.stateBadge}>
@@ -54,7 +58,7 @@ export default function RaceClient({ sessionKey }: Props) {
       </div>
     );
   }
-  if (drivers.isError || positions.isError || laps.isError || session.isError) {
+  if (drivers.isError || positions.isError || laps.isError || session.isError || intervals.isError) {
     return (
       <div className={styles.state} data-variant="error" role="alert">
         <span className={styles.stateBadge}>
@@ -82,7 +86,7 @@ export default function RaceClient({ sessionKey }: Props) {
 
       <ReplayControls />
       <div className={styles.grid}>
-        <TimingTable drivers={drivers.data} positions={positions.data} sessionStartMs={startMs}/>
+        <TimingTable drivers={drivers.data} positions={positions.data} sessionStartMs={startMs} intervals={intervals.data} laps={laps.data}/>
         <StandingsSidebar />
       </div>
     </div>

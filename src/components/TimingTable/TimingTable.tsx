@@ -1,10 +1,11 @@
 "use client";
 
-import type { Driver, Position } from "@/lib/types/openf1";
+import type { Driver, Interval, Lap, Position } from "@/lib/types/openf1";
 import styles from "./TimingTable.module.css";
-import { buildTimeIndex, latestAt } from "@/lib/replay/timeIndex";
+import { annotatePb, buildSessionBest, buildTimeIndex, latestAt, searchLatest, type CompletedLap } from "@/lib/replay/timeIndex";
 import { useMemo } from "react";
 import { useReplayStore } from "@/store/replayStore";
+import { formatGap, formatLapTime } from "@/lib/format";
 
 type TimingRow = {
   position: number;
@@ -22,14 +23,27 @@ type Props = {
   drivers: Driver[],
   positions: Position[],
   sessionStartMs: number
+  intervals: Interval[],
+  laps: Lap[]
 }
 
-export default function TimingTable({drivers, positions, sessionStartMs}: Props) {
-  const index = useMemo(() => buildTimeIndex(positions, sessionStartMs, r => ({position: r.position})), [positions, sessionStartMs])
+export default function TimingTable({drivers, positions, sessionStartMs, intervals, laps}: Props) {
+  const positionIndex = useMemo(() => buildTimeIndex(positions, sessionStartMs, r => ({position: r.position}), r => new Date(r.date).getTime()), [positions, sessionStartMs])
+  const intervalIndex = useMemo(() => buildTimeIndex(intervals, sessionStartMs, r => ({ gap: r.gap_to_leader, interval: r.interval}), r => new Date(r.date).getTime()), [intervals, sessionStartMs])
+  const completedLaps = useMemo(() => laps.filter((lap): lap is CompletedLap => lap.lap_duration !== null), [laps])
+  const lapIndex = useMemo(() => {
+    const idx = buildTimeIndex(completedLaps, sessionStartMs, r => ({duration: r.lap_duration, lapNumber: r.lap_number, isPb: false}), r => new Date(r.date_start).getTime() + r.lap_duration * 1000)
+    annotatePb(idx)
+    return idx
+  }, [completedLaps, sessionStartMs])
+  const sessionBest = useMemo(() => buildSessionBest(completedLaps, sessionStartMs), [completedLaps, sessionStartMs])
   const cursor = useReplayStore(s => s.cursor)
+  const rec = searchLatest(sessionBest, cursor)
   const rows: TimingRow[] = []
   for (const driver of drivers) {
-    const point = latestAt(index, driver.driver_number, cursor)    
+    const point = latestAt(positionIndex, driver.driver_number, cursor)
+    const time = latestAt(intervalIndex, driver.driver_number, cursor) 
+    const lap = latestAt(lapIndex, driver.driver_number, cursor)
     if (point === null) {
         continue
     }
@@ -38,10 +52,12 @@ export default function TimingTable({drivers, positions, sessionStartMs}: Props)
       driverNumber: driver.driver_number, 
       acronym: driver.name_acronym, 
       teamColor: `#${driver.team_colour}`,
-      gap: '-',
-      interval: '-',
-      lastLap: '-',
-      lapState: 'normal',
+      gap: point.position === 1 ? 'LEADER' : formatGap(time?.gap ?? null, '-'),
+      interval: point.position === 1 ? '-' : formatGap(time?.interval ?? null, '-'),
+      lastLap: lap ? formatLapTime(lap.duration) : '-',
+      lapState: lap && rec && lap.duration <= rec.best ? 'fastest'
+              : lap?.isPb ? 'pb'
+              : 'normal',
       inPit: false,
     })
   }
