@@ -44,6 +44,9 @@ export default function RaceClient({ sessionKey }: Props) {
     queryKey: ['teamssStandings', sessionKey],
     queryFn: () => openf1.championshipTeams(Number(sessionKey)),
   })
+  const queries = [drivers, positions, laps, session, intervals, pits, driversStandings, teamsStandings];
+  const isPending = queries.some(q => q.isPending);
+  const isError = queries.some(q => q.isError);
   useReplayTick()
   useEffect(() => {
     if (!session.data?.[0] || !positions.data) {
@@ -58,7 +61,7 @@ export default function RaceClient({ sessionKey }: Props) {
     setDuration(duration);
   }, [setDuration, session.data, positions.data])
 
-  if (drivers.isPending || positions.isPending || laps.isPending || session.isPending || intervals.isPending || pits.isPending || teamsStandings.isPending || driversStandings.isPending) {
+  if (isError) {
     return (
       <div className={styles.state} data-variant="loading" role="status">
         <span className={styles.stateBadge}>
@@ -69,7 +72,7 @@ export default function RaceClient({ sessionKey }: Props) {
       </div>
     );
   }
-  if (drivers.isError || positions.isError || laps.isError || session.isError || intervals.isError || pits.isError || teamsStandings.isError || driversStandings.isError) {
+  if (isPending) {
     return (
       <div className={styles.state} data-variant="error" role="alert">
         <span className={styles.stateBadge}>
@@ -80,19 +83,21 @@ export default function RaceClient({ sessionKey }: Props) {
       </div>
     );
   }
-  const startMs = new Date(session.data[0].date_start).getTime()
-  const totalLaps = laps.data.reduce((acc, n) => Math.max(acc, n.lap_number), 0)
+  // Invariant: guards above returned for any pending/error query,
+  // so every .data below is defined.
+  const startMs = new Date(session.data![0].date_start).getTime()
+  const totalLaps = laps.data!.reduce((acc, n) => Math.max(acc, n.lap_number), 0)
   return (
     <RaceView 
-    drivers={drivers.data}
-    positions={positions.data} 
-    intervals={intervals.data} 
+    drivers={drivers.data!}
+    positions={positions.data!} 
+    intervals={intervals.data!} 
     sessionKey={sessionKey} 
     totalLaps={totalLaps} 
     sessionStartMs={startMs}
-    laps={laps.data}
-    pits={pits.data}
-    championshipDrivers={driversStandings.data}
-    championshipTeams={teamsStandings.data}/>
+    laps={laps.data!}
+    pits={pits.data!}
+    championshipDrivers={driversStandings.data!}
+    championshipTeams={teamsStandings.data!}/>
   );
 }

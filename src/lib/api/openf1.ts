@@ -6,17 +6,28 @@ import {
 } from "@/lib/types/openf1";
 
 const BASE = "https://api.openf1.org/v1";
+const REQUEST_INTERVAL_MS = 350;
 
+const sleep = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms))
+let queueTail: Promise<void> = Promise.resolve()
 /**
  * Thin typed fetch wrapper.
  * Free tier limits: 3 req/s, 30 req/min — batch requests and cache
  * aggressively via TanStack Query (historical data never changes).
+ * It now makes a query queue and bypasses poisoned caches to avoid HTTP 429 error
  */
 async function get<T>(path: string, params: Record<string, string | number>): Promise<T[]> {
   const qs = new URLSearchParams(
     Object.entries(params).map(([k, v]) => [k, String(v)]),
   );
-  const res = await fetch(`${BASE}/${path}?${qs}`, {cache: 'force-cache'});
+  const myTurn = queueTail.then(() => sleep(REQUEST_INTERVAL_MS));
+  queueTail = myTurn;
+  await myTurn
+  let res = await fetch(`${BASE}/${path}?${qs}`, {cache: 'force-cache'});
+  if (!res.ok) {
+    await sleep(REQUEST_INTERVAL_MS)
+    res = await fetch(`${BASE}/${path}?${qs}`, { cache: "reload" });  // bypass poisoned cache, force network
+  }
   if (!res.ok) throw new ApiError(`OpenF1 ${path}: ${res.status}`, res.status);
   return res.json();
 }
