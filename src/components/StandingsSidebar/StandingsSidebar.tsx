@@ -1,15 +1,27 @@
 "use client";
 
+import type { ChampionshipDriver, ChampionshipTeam, Driver } from "@/lib/types/openf1";
 import styles from "./StandingsSidebar.module.css";
+import type { useSessionIndexes } from "@/lib/hooks/useSessionIndexes";
+import { useReplayStore } from "@/store/replayStore";
+import { latestAt } from "@/lib/replay/timeIndex";
+import { pointsForPosition } from "@/lib/points";
 
-// TODO: theoretical points = pre-race standings + points for current positions
-// (base from /v1/championship standings, live delta from replay cursor)
-const MOCK_DRIVERS = [
-  { acronym: "VER", points: 393, delta: +25, teamColor: "#3671C6" },
-  { acronym: "NOR", points: 371, delta: +18, teamColor: "#FF8000" },
-  { acronym: "LEC", points: 340, delta: +15, teamColor: "#E8002D" },
-  { acronym: "PIA", points: 291, delta: +8,  teamColor: "#FF8000" },
-];
+type DriverRow = {
+  acronym: string;
+  points: number;
+  delta: number;
+  teamColor: string,
+  positionStart: number,
+}
+
+type TeamRow = {
+  name: string;
+  points: number;
+  delta: number;
+  teamColor: string,
+  positionStart: number,
+}
 
 const MOCK_TEAMS = [
   { name: "McLaren",  points: 662, delta: +26, teamColor: "#FF8000" },
@@ -17,12 +29,57 @@ const MOCK_TEAMS = [
   { name: "Ferrari",  points: 584, delta: +27, teamColor: "#E8002D" },
 ];
 
-export default function StandingsSidebar() {
+type Props = {
+  drivers: Driver[],
+  positionIndex: ReturnType<typeof useSessionIndexes>['positionIndex'],
+  championshipDrivers: ChampionshipDriver[]
+  championshipTeams: ChampionshipTeam[]
+}
+
+export default function StandingsSidebar({drivers, positionIndex, championshipDrivers, championshipTeams}: Props) {
+  const cursor = useReplayStore(s => s.cursor)
+  const driversRow: DriverRow[] = []
+  const teamRow: TeamRow[] = []
+  const teamDeltas: Record<string, number> = {}
+  for (const entry of championshipDrivers) {
+    const driver = drivers.find(d => d.driver_number === entry.driver_number)
+    if (!driver) {
+      continue
+    }
+    const position = latestAt(positionIndex, driver.driver_number, cursor)
+    const delta = position ? pointsForPosition(position.position) : 0
+    const total = entry.points_start + delta
+    const teamName = driver.team_name
+    teamDeltas[teamName] = (teamDeltas[teamName] ?? 0) + delta
+    driversRow.push({
+      acronym: driver.name_acronym,
+      points: total,
+      delta: delta,
+      teamColor: `#${driver.team_colour}`,
+      positionStart: entry.position_start ?? 99
+    })
+  }
+  driversRow.sort((a, b) => b.points - a.points || a.positionStart - b.positionStart)
+  for (const entry of championshipTeams) {
+    const driver = drivers.find(d => d.team_name === entry.team_name)
+    if (!driver) {
+      continue
+    }
+    const total = entry.points_start + (teamDeltas[entry.team_name] ?? 0)
+    teamRow.push({
+      name: entry.team_name,
+      points: total,
+      delta: teamDeltas[entry.team_name],
+      teamColor: `#${driver?.team_colour}`,
+      positionStart: entry.position_start
+    })
+  }
+  teamRow.sort((a, b) => b.points - a.points || a.positionStart - b.positionStart)
   return (
     <aside className={styles.wrap} aria-label="Theoretical standings">
       <section className={`card ${styles.block}`}>
         <h2 className={styles.heading}>Теоретичний залік</h2>
-        {MOCK_DRIVERS.map((d, i) => (
+        {driversRow.map((d, i) => (
           <div key={d.acronym} className={styles.row}>
             <span className={`${styles.pos} tnum`}>{i + 1}</span>
             <i className={styles.teamBar} style={{ background: d.teamColor }} />
@@ -35,7 +92,7 @@ export default function StandingsSidebar() {
 
       <section className={`card ${styles.block}`}>
         <h2 className={styles.heading}>Кубок конструкторів</h2>
-        {MOCK_TEAMS.map((t, i) => (
+        {teamRow.map((t, i) => (
           <div key={t.name} className={styles.row}>
             <span className={`${styles.pos} tnum`}>{i + 1}</span>
             <i className={styles.teamBar} style={{ background: t.teamColor }} />

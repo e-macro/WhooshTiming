@@ -26,14 +26,15 @@
   font-weight: 700;
 }
 
+/* Timing + both standings blocks in one row on wide screens */
 .grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
+  grid-template-columns: minmax(0, 1fr) 600px;
   gap: 20px;
   align-items: start;
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1280px) {
   .grid {
     grid-template-columns: 1fr;
   }

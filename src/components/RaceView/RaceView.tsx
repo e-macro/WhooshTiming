@@ -1,4 +1,4 @@
-import type { Driver, Interval, Lap, Pit, Position } from '@/lib/types/openf1';
+import type { ChampionshipDriver, ChampionshipTeam, Driver, Interval, Lap, Pit, Position } from '@/lib/types/openf1';
 import styles from './RaceView.module.css'
 import ReplayControls from '../ReplayControls/ReplayControls';
 import TimingTable from '../TimingTable/TimingTable';
@@ -11,13 +11,15 @@ type Props = {
     positions: Position[],
     intervals: Interval[],
     laps: Lap[],
+    pits: Pit[]
+    championshipDrivers: ChampionshipDriver[],
+    championshipTeams: ChampionshipTeam[],
     sessionStartMs: number
     totalLaps: number,
     sessionKey: string
-    pits: Pit[]
 }
 
-const RaceView = ({drivers, positions, intervals, laps, sessionStartMs, totalLaps, sessionKey, pits}: Props) => {
+const RaceView = ({drivers, positions, intervals, laps, pits, championshipDrivers, championshipTeams, sessionStartMs, totalLaps, sessionKey}: Props) => {
     const { positionIndex, intervalIndex, lapIndex, sessionBest, completedLaps, pitIndex } = useSessionIndexes(positions, intervals, laps, pits, sessionStartMs)
     return (
     <div className={styles.page}>
@@ -41,7 +43,7 @@ const RaceView = ({drivers, positions, intervals, laps, sessionStartMs, totalLap
             lapIndex={lapIndex} 
             sessionBest={sessionBest}
             pitIndex={pitIndex}/>
-        <StandingsSidebar />
+        <StandingsSidebar drivers={drivers} positionIndex={positionIndex} championshipDrivers={championshipDrivers} championshipTeams={championshipTeams}/>
         </div>
     </div>
     );

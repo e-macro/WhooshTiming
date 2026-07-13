@@ -78,6 +78,26 @@ export interface Pit {
   date: string;
 }
 
+export interface ChampionshipDriver {
+  driver_number: number;
+  meeting_key: number;
+  points_current: number;
+  points_start: number;
+  position_current: number;
+  position_start: number;
+  session_key: number
+}
+
+export interface ChampionshipTeam {
+  meeting_key: number;
+  points_current: number;
+  points_start: number;
+  position_current: number;
+  position_start: number;
+  sessin_key: number,
+  team_name: string
+}
+
 /** ~3.7 Hz car coordinates — for the future track map. */
 export interface Location {
   session_key: number;

@@ -36,6 +36,14 @@ export default function RaceClient({ sessionKey }: Props) {
     queryKey: ['pits', sessionKey],
     queryFn: () => openf1.pits(Number(sessionKey)),
   })
+  const driversStandings = useQuery({
+    queryKey: ['driversStandings', sessionKey],
+    queryFn: () => openf1.championshipDrivers(Number(sessionKey)),
+  })
+  const teamsStandings = useQuery({
+    queryKey: ['teamssStandings', sessionKey],
+    queryFn: () => openf1.championshipTeams(Number(sessionKey)),
+  })
   useReplayTick()
   useEffect(() => {
     if (!session.data?.[0] || !positions.data) {
@@ -50,7 +58,7 @@ export default function RaceClient({ sessionKey }: Props) {
     setDuration(duration);
   }, [setDuration, session.data, positions.data])
 
-  if (drivers.isPending || positions.isPending || laps.isPending || session.isPending || intervals.isPending || pits.isPending) {
+  if (drivers.isPending || positions.isPending || laps.isPending || session.isPending || intervals.isPending || pits.isPending || teamsStandings.isPending || driversStandings.isPending) {
     return (
       <div className={styles.state} data-variant="loading" role="status">
         <span className={styles.stateBadge}>
@@ -61,7 +69,7 @@ export default function RaceClient({ sessionKey }: Props) {
       </div>
     );
   }
-  if (drivers.isError || positions.isError || laps.isError || session.isError || intervals.isError || pits.isError) {
+  if (drivers.isError || positions.isError || laps.isError || session.isError || intervals.isError || pits.isError || teamsStandings.isError || driversStandings.isError) {
     return (
       <div className={styles.state} data-variant="error" role="alert">
         <span className={styles.stateBadge}>
@@ -83,6 +91,8 @@ export default function RaceClient({ sessionKey }: Props) {
     totalLaps={totalLaps} 
     sessionStartMs={startMs}
     laps={laps.data}
-    pits={pits.data}/>
+    pits={pits.data}
+    championshipDrivers={driversStandings.data}
+    championshipTeams={teamsStandings.data}/>
   );
 }
