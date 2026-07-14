@@ -23,12 +23,6 @@ type TeamRow = {
   positionStart: number,
 }
 
-const MOCK_TEAMS = [
-  { name: "McLaren",  points: 662, delta: +26, teamColor: "#FF8000" },
-  { name: "Red Bull", points: 589, delta: +25, teamColor: "#3671C6" },
-  { name: "Ferrari",  points: 584, delta: +27, teamColor: "#E8002D" },
-];
-
 type Props = {
   drivers: Driver[],
   positionIndex: ReturnType<typeof useSessionIndexes>['positionIndex'],

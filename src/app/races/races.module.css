@@ -17,11 +17,31 @@
   letter-spacing: -0.01em;
 }
 
-.season {
-  color: var(--text-dim);
+/* Season switcher — row of link chips */
+.seasons {
+  display: flex;
+  gap: 8px;
+}
+
+.chip {
+  font-family: var(--font-data);
   font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+  padding: 6px 14px;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: var(--squircle-sm);
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.chip:hover {
+  color: var(--text);
+  border-color: var(--text-faint);
+}
+
+.chipActive {
+  color: var(--text);
+  background: var(--surface-raised);
+  border-color: var(--accent);
 }
 
 .grid {
