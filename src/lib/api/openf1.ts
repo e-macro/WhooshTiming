@@ -16,14 +16,17 @@ let queueTail: Promise<void> = Promise.resolve()
  * aggressively via TanStack Query (historical data never changes).
  * It now makes a query queue and bypasses poisoned caches to avoid HTTP 429 error
  */
-async function get<T>(path: string, params: Record<string, string | number>): Promise<T[]> {
+async function get<T>(path: string, params: Record<string, string | number>, opts?: CacheOpts): Promise<T[]> {
   const qs = new URLSearchParams(
     Object.entries(params).map(([k, v]) => [k, String(v)]),
   );
   const myTurn = queueTail.then(() => sleep(REQUEST_INTERVAL_MS));
   queueTail = myTurn;
   await myTurn
-  let res = await fetch(`${BASE}/${path}?${qs}`, {cache: 'force-cache'});
+  const init = opts?.revalidate !== undefined
+    ? { next: { revalidate: opts.revalidate}}
+    : { cache: 'force-cache' as const}
+  let res = await fetch(`${BASE}/${path}?${qs}`, init);
   if (!res.ok) {
     await sleep(REQUEST_INTERVAL_MS)
     res = await fetch(`${BASE}/${path}?${qs}`, { cache: "reload" });  // bypass poisoned cache, force network
@@ -33,9 +36,9 @@ async function get<T>(path: string, params: Record<string, string | number>): Pr
 }
 
 export const openf1 = {
-  meetings: (year: number) => get<Meeting>("meetings", { year }),
+  meetings: (year: number, opts?: CacheOpts) => get<Meeting>("meetings", { year }, opts),
   sessions: (meetingKey: number) => get<Session>("sessions", { meeting_key: meetingKey }),
-  raceSessions: (year: number) => get<Session>("sessions", { year, session_name: "Race" }),
+  raceSessions: (year: number, opts?: CacheOpts) => get<Session>("sessions", { year, session_name: "Race" }, opts),
   drivers: (sessionKey: number) => get<Driver>("drivers", { session_key: sessionKey }),
   positions: (sessionKey: number) => get<Position>("position", { session_key: sessionKey }),
   intervals: (sessionKey: number) => get<Interval>("intervals", { session_key: sessionKey }),
@@ -48,6 +51,9 @@ export const openf1 = {
   // Fetch in time windows (date>=...&date<=...) — never all at once.
 };
 
+export type CacheOpts = {
+  revalidate?: number
+}
 export class ApiError extends Error {
   constructor(message: string, public readonly status: number) {
     super(message)

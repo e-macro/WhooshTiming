@@ -15,6 +15,7 @@ export interface Meeting {
   location: string;
   date_start: string; // ISO 8601
   year: number;
+  is_cancelled: boolean,
 }
 
 export interface Session {

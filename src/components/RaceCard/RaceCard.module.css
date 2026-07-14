@@ -11,6 +11,48 @@
   background: var(--surface-raised);
 }
 
+/* Non-clickable states: no hover affordance, muted content */
+.card[data-status] {
+  cursor: default;
+}
+
+.card[data-status]:hover {
+  border-color: var(--border);
+  background: var(--surface);
+}
+
+.card[data-status] .name,
+.card[data-status] .round {
+  color: var(--text-dim);
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.badge {
+  font-family: var(--font-data);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--time-slow);
+  color: var(--time-slow);
+}
+
+.card[data-status="cancelled"] .badge {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.card[data-status="cancelled"] .name {
+  text-decoration: line-through;
+  text-decoration-color: var(--text-faint);
+}
+
 .round {
   font-size: 11px;
   color: var(--accent);
