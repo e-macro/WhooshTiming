@@ -1,0 +1,61 @@
+/* Track status frame — outline around live timing, broadcast-style.
+   Status drives the outline via data-status; green shows no permanent
+   outline, only a fading flash right after a restart. */
+.frame {
+  position: relative;
+  border-radius: var(--squircle-lg);
+  outline: 2px solid transparent;
+  outline-offset: 4px;
+  transition: outline-color 0.3s;
+}
+
+.frame[data-status="yellow"],
+.frame[data-status="sc"] {
+  outline-color: var(--time-slow);
+}
+
+/* VSC: same colour family as SC but dashed — slower, not neutralized */
+.frame[data-status="vsc"] {
+  outline-style: dashed;
+  outline-color: var(--time-slow);
+}
+
+.frame[data-status="red"] {
+  outline-color: var(--accent);
+}
+
+/* Session over: chequered-flag ring — diagonal light/dark stripes.
+   `outline` is single-colour, so the two-tone ring is a gradient overlay
+   masked down to a 3px frame (padding-box XOR trick). */
+.frame[data-status="chequered"]::before {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  border-radius: var(--squircle-lg);
+  padding: 3px;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--text) 0 12px,
+    var(--bg) 12px 24px
+  );
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Restart flash: an empty overlay whose green outline fades out.
+   Re-mounted with a fresh key per milestone, so the animation restarts. */
+.flash {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--squircle-lg);
+  outline: 2px solid var(--time-pb);
+  outline-offset: 4px;
+  pointer-events: none;
+  animation: flashFade 3s ease-out forwards;
+}
+
+@keyframes flashFade {
+  from { outline-color: var(--time-pb); }
+  to   { outline-color: transparent; }
+}

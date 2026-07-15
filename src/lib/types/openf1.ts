@@ -108,3 +108,17 @@ export interface Location {
   z: number;
   date: string;
 }
+
+export interface RaceControl {
+  category: string,
+  date: string,
+  driver_number: number | null,
+  flag: string | null,
+  lap_number: number,
+  meeting_key: number,
+  message: string,
+  qualifying_phase: number | null,
+  scope: string | null,
+  sector: number | null,
+  session_key: number
+}

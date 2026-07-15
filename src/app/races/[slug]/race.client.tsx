@@ -41,10 +41,14 @@ export default function RaceClient({ sessionKey }: Props) {
     queryFn: () => openf1.championshipDrivers(Number(sessionKey)),
   })
   const teamsStandings = useQuery({
-    queryKey: ['teamssStandings', sessionKey],
+    queryKey: ['teamsStandings', sessionKey],
     queryFn: () => openf1.championshipTeams(Number(sessionKey)),
   })
-  const queries = [drivers, positions, laps, session, intervals, pits, driversStandings, teamsStandings];
+  const raceControl = useQuery({
+    queryKey: ['raceControl', sessionKey],
+    queryFn: () => openf1.raceControl(Number(sessionKey)),
+  })
+  const queries = [drivers, positions, laps, session, intervals, pits, driversStandings, teamsStandings, raceControl];
   const isPending = queries.some(q => q.isPending);
   const isError = queries.some(q => q.isError);
   useReplayTick()
@@ -98,6 +102,7 @@ export default function RaceClient({ sessionKey }: Props) {
     laps={laps.data!}
     pits={pits.data!}
     championshipDrivers={driversStandings.data!}
-    championshipTeams={teamsStandings.data!}/>
+    championshipTeams={teamsStandings.data!}
+    raceControl={raceControl.data!}/>
   );
 }
