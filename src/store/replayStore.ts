@@ -20,13 +20,13 @@ interface ReplayState {
   setDuration: (ms: number) => void;
   /** Advance cursor by real elapsed ms * speed (called from a rAF/interval tick). */
   tick: (elapsedMs: number) => void;
+  reset: () => void
 }
 
+const initialState: Pick<ReplayState, 'cursor' | 'duration' | 'speed' | 'isPlaying'> = { cursor: 0, duration: 0, speed: 10, isPlaying: false}
+
 export const useReplayStore = create<ReplayState>((set) => ({
-  cursor: 0,
-  duration: 0,
-  speed: 10,
-  isPlaying: false,
+  ...initialState,
 
   play: () => set({ isPlaying: true }),
   pause: () => set({ isPlaying: false }),
@@ -40,4 +40,5 @@ export const useReplayStore = create<ReplayState>((set) => ({
       if (next >= s.duration) return { cursor: s.duration, isPlaying: false };
       return { cursor: next };
     }),
+    reset: () => set(initialState)
 }));

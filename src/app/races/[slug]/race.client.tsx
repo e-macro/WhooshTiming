@@ -11,6 +11,10 @@ import RaceView from "@/components/RaceView/RaceView";
 type Props = { sessionKey: string };
 
 export default function RaceClient({ sessionKey }: Props) {
+  const reset = useReplayStore(s => s.reset)
+  useEffect(() => {
+    reset()
+  }, [sessionKey, reset])
   const setDuration = useReplayStore(s => s.setDuration)
   const drivers = useQuery({
     queryKey: ['drivers', sessionKey],
