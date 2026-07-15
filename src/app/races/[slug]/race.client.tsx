@@ -65,7 +65,7 @@ export default function RaceClient({ sessionKey }: Props) {
     setDuration(duration);
   }, [setDuration, session.data, positions.data])
 
-  if (isError) {
+  if (isPending) {
     return (
       <div className={styles.state} data-variant="loading" role="status">
         <span className={styles.stateBadge}>
@@ -76,7 +76,7 @@ export default function RaceClient({ sessionKey }: Props) {
       </div>
     );
   }
-  if (isPending) {
+  if (isError) {
     return (
       <div className={styles.state} data-variant="error" role="alert">
         <span className={styles.stateBadge}>
