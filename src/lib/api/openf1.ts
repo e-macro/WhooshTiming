@@ -4,6 +4,7 @@ import {
   ChampionshipDriver,
   type ChampionshipTeam,
   type RaceControl,
+  type Stint,
 } from "@/lib/types/openf1";
 
 const BASE = "https://api.openf1.org/v1";
@@ -48,7 +49,8 @@ export const openf1 = {
   pits: (sessionKey: number) => get<Pit>('pit', {session_key: sessionKey}),
   championshipDrivers: (sessionKey: number) => get<ChampionshipDriver>('championship_drivers', {session_key: sessionKey}),
   championshipTeams: (sessionKey: number) => get<ChampionshipTeam>('championship_teams', {session_key: sessionKey}),
-  raceControl: (sessionKey: number) => get<RaceControl>('race_control', {session_key: sessionKey})
+  raceControl: (sessionKey: number) => get<RaceControl>('race_control', {session_key: sessionKey}),
+  stints: (sessionKey: number) => get<Stint>('stints', { session_key: sessionKey})
   // NOTE: /v1/location is huge (~0.5M records per race).
   // Fetch in time windows (date>=...&date<=...) — never all at once.
 };

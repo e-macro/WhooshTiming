@@ -6,6 +6,7 @@ import { latestAt, searchLatest} from "@/lib/replay/timeIndex";
 import { useReplayStore } from "@/store/replayStore";
 import { formatGap, formatLapTime } from "@/lib/format";
 import type { useSessionIndexes } from "@/lib/hooks/useSessionIndexes";
+import { stintAt } from "@/lib/replay/stints";
 
 type TimingRow = {
   position: number;
@@ -17,6 +18,7 @@ type TimingRow = {
   lastLap: string;
   lapState: "fastest" | "pb" | "normal";
   inPit: boolean;
+  compound: string | null,
   isOut: boolean
 };
 
@@ -26,12 +28,13 @@ type Props = {
   intervalIndex: ReturnType<typeof useSessionIndexes>['intervalIndex'],
   lapIndex: ReturnType<typeof useSessionIndexes>['lapIndex'],
   sessionBest: ReturnType<typeof useSessionIndexes>['sessionBest']
-  pitIndex: ReturnType<typeof useSessionIndexes>['pitIndex']
+  pitIndex: ReturnType<typeof useSessionIndexes>['pitIndex'],
+  stintIndex: ReturnType<typeof useSessionIndexes>['stintIndex']
 }
 
 const OUT_THRESHOLD_MS = 180000
 
-export default function TimingTable({drivers, positionIndex, intervalIndex, lapIndex, pitIndex, sessionBest}: Props) {
+export default function TimingTable({drivers, positionIndex, intervalIndex, lapIndex, pitIndex, sessionBest, stintIndex}: Props) {
   const cursor = useReplayStore(s => s.cursor)
   const rec = searchLatest(sessionBest, cursor)
   const rows: TimingRow[] = []
@@ -40,6 +43,9 @@ export default function TimingTable({drivers, positionIndex, intervalIndex, lapI
     const time = latestAt(intervalIndex, driver.driver_number, cursor) 
     const lap = latestAt(lapIndex, driver.driver_number, cursor)
     const pit = latestAt(pitIndex, driver.driver_number, cursor)
+    const currentLapPerDriver = lap ? lap.lapNumber + 1 : 1
+    const stint = stintAt(stintIndex, driver.driver_number, currentLapPerDriver)
+    const compound = stint ? stint.compound : null
     if (point === null) {
         continue
     }
@@ -63,6 +69,7 @@ export default function TimingTable({drivers, positionIndex, intervalIndex, lapI
               : lap?.isPb ? 'pb'
               : 'normal',
       inPit: pit !== null && cursor <= pit.t + pit.pitDuration * 1000,
+      compound,
       isOut
     })
   }
@@ -84,6 +91,11 @@ export default function TimingTable({drivers, positionIndex, intervalIndex, lapI
             <i className={styles.teamBar} style={{ background: row.teamColor }} />
             <b>{row.acronym}</b>
             <span className={`${styles.num} tnum`}>{row.driverNumber}</span>
+            {row.compound && (
+              <span className={styles.tyre} data-compound={row.compound} title={row.compound}>
+                {row.compound[0]}
+              </span>
+            )}
             {row.inPit && <span className={styles.pit}>PIT</span>}
           </span>
           <span className={`${styles.right} tnum`}>{row.gap}</span>

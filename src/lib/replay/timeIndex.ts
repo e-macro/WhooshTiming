@@ -5,7 +5,7 @@ export type LapPoint = TimePoint<{ duration: number; lapNumber: number; isPb: bo
 export type CompletedLap = Lap & { lap_duration: number }
 
 export function buildTimeIndex<R extends { driver_number: number}, T>(records: R[], startMs: number, toPoint: (record: R) => T, toTime: (record: R) => number): Map<number, TimePoint<T>[]> {
-    const driver = new Map<number, TimePoint<T>[]>
+    const driver = new Map<number, TimePoint<T>[]>()
     for (const record of records) {
         const t = toTime(record) - startMs
         let pos = driver.get(record.driver_number)

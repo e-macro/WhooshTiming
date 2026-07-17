@@ -1,4 +1,4 @@
-import type { ChampionshipDriver, ChampionshipTeam, Driver, Interval, Lap, Pit, Position, RaceControl } from '@/lib/types/openf1';
+import type { ChampionshipDriver, ChampionshipTeam, Driver, Interval, Lap, Pit, Position, RaceControl, Stint } from '@/lib/types/openf1';
 import styles from './RaceView.module.css'
 import ReplayControls from '../ReplayControls/ReplayControls';
 import TimingTable from '../TimingTable/TimingTable';
@@ -17,14 +17,15 @@ type Props = {
     pits: Pit[]
     championshipDrivers: ChampionshipDriver[],
     championshipTeams: ChampionshipTeam[],
-    raceControl: RaceControl[]
+    raceControl: RaceControl[],
+    stints: Stint[],
     sessionStartMs: number
     totalLaps: number,
     sessionKey: string
 }
 
-const RaceView = ({drivers, positions, intervals, laps, pits, championshipDrivers, championshipTeams, raceControl, sessionStartMs, totalLaps, sessionKey}: Props) => {
-    const { positionIndex, intervalIndex, lapIndex, sessionBest, completedLaps, pitIndex } = useSessionIndexes(positions, intervals, laps, pits, sessionStartMs)
+const RaceView = ({drivers, positions, intervals, laps, pits, championshipDrivers, championshipTeams, raceControl, stints, sessionStartMs, totalLaps, sessionKey}: Props) => {
+    const { positionIndex, intervalIndex, lapIndex, sessionBest, completedLaps, pitIndex, stintIndex } = useSessionIndexes(positions, intervals, laps, pits, stints, sessionStartMs)
     const statusMilestones = useMemo(() => buildTrackStatus(raceControl, sessionStartMs), [raceControl, sessionStartMs])
     return (
     <div className={styles.page}>
@@ -49,6 +50,7 @@ const RaceView = ({drivers, positions, intervals, laps, pits, championshipDriver
             lapIndex={lapIndex} 
             sessionBest={sessionBest}
             pitIndex={pitIndex}
+            stintIndex={stintIndex}
         />
         </TrackStatusFrame>
         <StandingsSidebar drivers={drivers} positionIndex={positionIndex} championshipDrivers={championshipDrivers} championshipTeams={championshipTeams}/>

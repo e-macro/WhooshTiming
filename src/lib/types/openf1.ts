@@ -122,3 +122,14 @@ export interface RaceControl {
   sector: number | null,
   session_key: number
 }
+
+export interface Stint {
+  compound: string, // SOFT, MEDIUM, HARD, INTERMEDIATE, WET
+  driver_number: number,
+  lap_end: number | null,
+  lap_start: number,
+  meeting_key: number,
+  session_key: number,
+  stint_number: number,
+  tyre_age_at_start: number
+}

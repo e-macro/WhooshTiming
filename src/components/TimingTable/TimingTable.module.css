@@ -60,6 +60,46 @@
   padding: 1px 5px;
 }
 
+/* Tyre compound: letter in a circle of three arcs (conic ring + mask) */
+.tyre {
+  --tyre-c: var(--text-faint); /* fallback for unknown compounds */
+  position: relative;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-data);
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--tyre-c);
+  flex-shrink: 0;
+}
+
+.tyre::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  padding: 2px;
+  background: repeating-conic-gradient(
+    from 15deg,
+    var(--tyre-c) 0 80deg,
+    transparent 80deg 120deg
+  );
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+.tyre[data-compound="SOFT"]         { --tyre-c: var(--tyre-soft); }
+.tyre[data-compound="MEDIUM"]       { --tyre-c: var(--tyre-medium); }
+.tyre[data-compound="HARD"]         { --tyre-c: var(--tyre-hard); }
+.tyre[data-compound="INTERMEDIATE"] { --tyre-c: var(--tyre-inter); }
+.tyre[data-compound="WET"]          { --tyre-c: var(--tyre-wet); }
+
+.row[data-out="true"] .tyre {
+  --tyre-c: var(--text-faint);
+}
+
 /* Retired driver (DNF/DNS) — whole row fades, colours desaturate */
 .row[data-out="true"] {
   color: var(--text-faint);
