@@ -39,6 +39,7 @@ async function get<T>(path: string, params: Record<string, string | number>, opt
 
 export const openf1 = {
   meetings: (year: number, opts?: CacheOpts) => get<Meeting>("meetings", { year }, opts),
+  meeting: (meetingKey: number) => get<Meeting>('meetings', { meeting_key: meetingKey}),
   sessions: (meetingKey: number) => get<Session>("sessions", { meeting_key: meetingKey }),
   raceSessions: (year: number, opts?: CacheOpts) => get<Session>("sessions", { year, session_name: "Race" }, opts),
   drivers: (sessionKey: number) => get<Driver>("drivers", { session_key: sessionKey }),

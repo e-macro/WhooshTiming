@@ -19,12 +19,14 @@ type Props = {
     championshipTeams: ChampionshipTeam[],
     raceControl: RaceControl[],
     stints: Stint[],
-    sessionStartMs: number
+    meetingName: string | undefined,
+    sessionName: string,
+    sessionStartMs: number,
     totalLaps: number,
     sessionKey: string
 }
 
-const RaceView = ({drivers, positions, intervals, laps, pits, championshipDrivers, championshipTeams, raceControl, stints, sessionStartMs, totalLaps, sessionKey}: Props) => {
+const RaceView = ({drivers, positions, intervals, laps, pits, championshipDrivers, championshipTeams, raceControl, stints, meetingName, sessionName, sessionStartMs, totalLaps, sessionKey}: Props) => {
     const { positionIndex, intervalIndex, lapIndex, sessionBest, completedLaps, pitIndex, stintIndex } = useSessionIndexes(positions, intervals, laps, pits, stints, sessionStartMs)
     const statusMilestones = useMemo(() => buildTrackStatus(raceControl, sessionStartMs), [raceControl, sessionStartMs])
     return (
@@ -33,7 +35,7 @@ const RaceView = ({drivers, positions, intervals, laps, pits, championshipDriver
         <div>
             <p className={styles.eyebrow}>Race replay</p>
             <h1 className={styles.title}>
-            Session <span className="tnum">#{sessionKey}</span>
+            {meetingName ?? `Session #${sessionKey}`} - {sessionName}
             </h1>
         </div>
         {/* TODO: lap counter — current lap / total from replay cursor */}
