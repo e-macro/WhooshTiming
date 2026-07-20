@@ -4,7 +4,6 @@ import styles from "./Header.module.css";
 const NAV = [
   { href: "/races", label: "Гонки" },
   { href: "/standings", label: "Залік" },
-  { href: "/schedule", label: "Календар" },
 ];
 
 export default function Header() {

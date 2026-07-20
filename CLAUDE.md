@@ -80,7 +80,7 @@ Core idea — **the UI never knows whether data is a replay or real live**:
 4. Theoretical standings sidebar (drivers + constructors)
 5. Track map page/panel from `/v1/location`
 6. Telemetry page (`/v1/car_data`) — speed/throttle/brake comparisons
-7. `/standings` and `/schedule` full pages
+7. `/standings` full page
 
 ## Commands
 

@@ -23,3 +23,17 @@ export function toRaceListItem(meeting: Meeting, session: Session, round: number
             : 'past'
     }
 }
+
+export function findLastPastSession(sessions: Session[], nowMs: number): Session | null {
+    let best: Session | null = null
+    for (const session of sessions) {
+        const dateStart = new Date(session.date_start).getTime()
+        if(dateStart > nowMs) {
+            continue
+        } 
+        else if (best === null || dateStart > new Date(best.date_start).getTime() ) {
+            best = session
+        }
+    }
+    return best
+}

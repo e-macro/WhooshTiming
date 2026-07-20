@@ -42,6 +42,7 @@ export const openf1 = {
   meeting: (meetingKey: number) => get<Meeting>('meetings', { meeting_key: meetingKey}),
   sessions: (meetingKey: number) => get<Session>("sessions", { meeting_key: meetingKey }),
   raceSessions: (year: number, opts?: CacheOpts) => get<Session>("sessions", { year, session_name: "Race" }, opts),
+  sessionsByYear: (year: number) => get<Session>('sessions', { year }),
   drivers: (sessionKey: number) => get<Driver>("drivers", { session_key: sessionKey }),
   positions: (sessionKey: number) => get<Position>("position", { session_key: sessionKey }),
   intervals: (sessionKey: number) => get<Interval>("intervals", { session_key: sessionKey }),

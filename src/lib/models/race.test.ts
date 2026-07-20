@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import type { Meeting, Session } from "../types/openf1";
-import { toRaceListItem } from "./race";
+import { findLastPastSession, toRaceListItem } from "./race";
 
 const makeMeeting = (overrides: Partial<Meeting> = {}): Meeting => ({
     meeting_key: 1,
@@ -47,5 +47,20 @@ describe('toRaceListItem', () => {
     it('marks race as cancelled with date is after NOW', () => {
         const item = toRaceListItem(makeMeeting({ is_cancelled: true }), makeSession({date_start: FUTURE_DATE}), 1, NOW);
         expect(item.status).toBe('cancelled')
+    })
+})
+
+describe('findLastPastSession', () => {
+    it('returns last race by date', () => {
+        const sessions = [
+            makeSession({session_key: 4}),
+            makeSession({date_start: '2025-12-01T00:00:00+00:00', session_key: 3}),
+            makeSession({date_start: '2025-11-01T00:00:00+00:00', session_key: 2}),
+            makeSession({date_start: '2025-10-01T00:00:00+00:00', session_key: 1}),
+        ]
+        expect(findLastPastSession(sessions, NOW)?.session_key).toBe(4)
+    })
+    it('returns null for empty array', () => {
+        expect(findLastPastSession([], NOW)).toBe(null)
     })
 })
