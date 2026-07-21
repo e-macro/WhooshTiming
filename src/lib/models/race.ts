@@ -31,7 +31,7 @@ export function findLastPastSession(sessions: Session[], nowMs: number): Session
         if(dateStart > nowMs) {
             continue
         } 
-        else if (best === null || dateStart > new Date(best.date_start).getTime() ) {
+        else if (best === null || dateStart > new Date(best.date_start).getTime()) {
             best = session
         }
     }

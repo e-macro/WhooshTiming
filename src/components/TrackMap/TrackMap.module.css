@@ -1,3 +1,92 @@
+.wrap {
+  padding: 16px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.headRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.heading {
+  font-family: var(--font-data);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+}
+
+/* Live status wording next to the heading — colour matches the outline */
+.statusLabel {
+  font-family: var(--font-data);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid currentColor;
+}
+
+.statusLabel[data-status="yellow"],
+.statusLabel[data-status="sc"],
+.statusLabel[data-status="vsc"] {
+  color: var(--time-slow);
+}
+
+.statusLabel[data-status="red"] {
+  color: var(--accent);
+}
+
+.statusLabel[data-status="chequered"] {
+  color: var(--text-faint);
+}
+
+.svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Track outline: thick enough to read as tarmac, not a wire.
+   Stroke colour follows track status (same conventions as TrackStatusFrame). */
+.track {
+  fill: none;
+  stroke: var(--surface-raised);
+  stroke-width: 10;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  transition: stroke 0.3s;
+}
+
+.svg[data-status="yellow"] .track,
+.svg[data-status="sc"] .track {
+  stroke: var(--time-slow);
+}
+
+/* VSC: dashed, same convention as the frame outline;
+   gap wider than the dash so the breaks read clearly at track scale */
+.svg[data-status="vsc"] .track {
+  stroke: var(--time-slow);
+  stroke-dasharray: 12 18;
+}
+
+.svg[data-status="red"] .track {
+  stroke: var(--accent);
+}
+
+/* Sector boundary "cut": a background-coloured tick painted over the track —
+   erases a constant-width slice, so gaps look identical on every circuit. */
+.cut {
+  stroke: var(--surface);
+  stroke-width: 8;
+}
+
+/* Loading placeholder */
 .placeholder {
   min-height: 420px;
   display: flex;
@@ -9,11 +98,7 @@
   padding: 32px;
 }
 
-.title {
-  font-family: var(--font-data);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
+.placeholder .heading {
   color: var(--text-faint);
 }
 

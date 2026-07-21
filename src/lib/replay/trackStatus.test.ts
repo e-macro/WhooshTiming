@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import type { RaceControl } from "../types/openf1";
 import { buildTrackStatus } from "./trackStatus";
+import { atSec, START } from "./testFactories";
 
-const START = Date.parse("2026-01-01T00:00:00+00:00");
-const atSec = (s: number) => new Date(START + s * 1000).toISOString();
+
 
 
 const makeMessage = (overrides: Partial<RaceControl> = {}): RaceControl => ({

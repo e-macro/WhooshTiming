@@ -7,6 +7,8 @@ import { useReplayStore } from "@/store/replayStore";
 import { useEffect } from "react";
 import { useReplayTick } from "@/lib/hooks/useReplayTick";
 import RaceView from "@/components/RaceView/RaceView";
+import { findFastestLap } from "@/lib/replay/trackMap";
+import type { CompletedLap } from "@/lib/replay/timeIndex";
 
 type Props = { sessionKey: string };
 
@@ -61,7 +63,17 @@ export default function RaceClient({ sessionKey }: Props) {
     queryFn: () => openf1.meeting(session.data![0].meeting_key),
     enabled: !!session.data?.[0]
   })
-  
+  const completedLap = laps.data?.filter((l): l is CompletedLap => l.lap_duration !== null) ?? []
+  const fastestLap = findFastestLap(completedLap)
+  const location = useQuery({
+    queryKey: ['location', sessionKey, fastestLap?.driver_number, fastestLap?.lap_number],
+    queryFn: () => {
+      const dateFrom = fastestLap!.date_start
+      const dateTo = new Date(new Date(fastestLap!.date_start).getTime() + fastestLap!.lap_duration! * 1000).toISOString()
+      return openf1.location(Number(sessionKey), fastestLap!.driver_number, dateFrom, dateTo)
+    },
+    enabled: !!fastestLap
+  })
   const queries = [drivers, positions, laps, session, intervals, pits, driversStandings, teamsStandings, raceControl, stints];
   const isPending = queries.some(q => q.isPending);
   const isError = queries.some(q => q.isError);
@@ -101,7 +113,6 @@ export default function RaceClient({ sessionKey }: Props) {
       </div>
     );
   }
-  console.log(meeting.data);
   // Invariant: guards above returned for any pending/error query,
   // so every .data below is defined.
   const startMs = new Date(session.data![0].date_start).getTime()
@@ -119,8 +130,11 @@ export default function RaceClient({ sessionKey }: Props) {
     stints={stints.data!}
     meetingName={meeting.data?.[0]?.meeting_name}
     sessionName={session.data![0].session_name}
+    location={location.data ?? []}
+    fastestLap={fastestLap}
     sessionKey={sessionKey} 
     totalLaps={totalLaps} 
-    sessionStartMs={startMs}/>
+    sessionStartMs={startMs}
+    />
   );
 }

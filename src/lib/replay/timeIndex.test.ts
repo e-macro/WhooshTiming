@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { annotatePb, buildLapMilestones, buildSessionBest, buildTimeIndex, searchLatest, type CompletedLap, type LapPoint } from "./timeIndex";
+import { annotatePb, buildLapMilestones, buildSessionBest, buildTimeIndex, searchLatest, type LapPoint } from "./timeIndex";
 import type { Position } from "../types/openf1";
+import { makeCompletedLap } from "./testFactories";
 
 const makePosition = (overrides: Partial<Position> = {}): Position => ({
     session_key: 1,
@@ -15,19 +16,6 @@ const makeLapPoint = (overrides: Partial<LapPoint> = {}): LapPoint => ({
     duration: 100,
     lapNumber: 1,
     isPb: false,
-    ...overrides
-})
-
-const makeCompletedLap = (overrides: Partial<CompletedLap> = {}): CompletedLap => ({
-    session_key: 1,
-    driver_number: 1,
-    lap_number: 1,
-    lap_duration: 90, // seconds; null for in/out laps
-    duration_sector_1: 20,
-    duration_sector_2: 35,
-    duration_sector_3: 35,
-    is_pit_out_lap: false,
-    date_start: '2025-01-01T00:00:00+00:00',
     ...overrides
 })
 

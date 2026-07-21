@@ -1,4 +1,4 @@
-import type { ChampionshipDriver, ChampionshipTeam, Driver, Interval, Lap, Pit, Position, RaceControl, Stint } from '@/lib/types/openf1';
+import type { ChampionshipDriver, ChampionshipTeam, Driver, Interval, Lap, Location, Pit, Position, RaceControl, Stint } from '@/lib/types/openf1';
 import styles from './RaceView.module.css'
 import ReplayControls from '../ReplayControls/ReplayControls';
 import TimingTable from '../TimingTable/TimingTable';
@@ -9,6 +9,7 @@ import { useMemo } from 'react';
 import { buildTrackStatus } from '@/lib/replay/trackStatus';
 import TrackStatusFrame from '../TrackStatusFrame/TrackStatusFrame';
 import TrackMap from '../TrackMap/TrackMap';
+import type { CompletedLap } from '@/lib/replay/timeIndex';
 
 type Props = {
     drivers: Driver[],
@@ -20,6 +21,8 @@ type Props = {
     championshipTeams: ChampionshipTeam[],
     raceControl: RaceControl[],
     stints: Stint[],
+    location: Location[],
+    fastestLap: CompletedLap | null,
     meetingName: string | undefined,
     sessionName: string,
     sessionStartMs: number,
@@ -27,7 +30,7 @@ type Props = {
     sessionKey: string
 }
 
-const RaceView = ({drivers, positions, intervals, laps, pits, championshipDrivers, championshipTeams, raceControl, stints, meetingName, sessionName, sessionStartMs, totalLaps, sessionKey}: Props) => {
+const RaceView = ({drivers, positions, intervals, laps, pits, championshipDrivers, championshipTeams, raceControl, stints, location, fastestLap, meetingName, sessionName, sessionStartMs, totalLaps, sessionKey}: Props) => {
     const { positionIndex, intervalIndex, lapIndex, sessionBest, completedLaps, pitIndex, stintIndex } = useSessionIndexes(positions, intervals, laps, pits, stints, sessionStartMs)
     const statusMilestones = useMemo(() => buildTrackStatus(raceControl, sessionStartMs), [raceControl, sessionStartMs])
     return (
@@ -57,7 +60,7 @@ const RaceView = ({drivers, positions, intervals, laps, pits, championshipDriver
             stintIndex={stintIndex}
         />
         </TrackStatusFrame>
-        <TrackMap />
+        <TrackMap location={location} milestones={statusMilestones} fastestLap={fastestLap}/>
         </div>
 
         <div className={styles.bottom}>
