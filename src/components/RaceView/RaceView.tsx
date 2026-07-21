@@ -8,6 +8,7 @@ import LapCounter from '../LapCounter/LapCounter';
 import { useMemo } from 'react';
 import { buildTrackStatus } from '@/lib/replay/trackStatus';
 import TrackStatusFrame from '../TrackStatusFrame/TrackStatusFrame';
+import TrackMap from '../TrackMap/TrackMap';
 
 type Props = {
     drivers: Driver[],
@@ -43,18 +44,23 @@ const RaceView = ({drivers, positions, intervals, laps, pits, championshipDriver
         </header>
 
         <ReplayControls />
-        <div className={styles.grid}>
+
+        <div className={styles.top}>
         <TrackStatusFrame milestones={statusMilestones}>
-        <TimingTable 
-            drivers={drivers} 
-            positionIndex={positionIndex} 
-            intervalIndex={intervalIndex} 
-            lapIndex={lapIndex} 
+        <TimingTable
+            drivers={drivers}
+            positionIndex={positionIndex}
+            intervalIndex={intervalIndex}
+            lapIndex={lapIndex}
             sessionBest={sessionBest}
             pitIndex={pitIndex}
             stintIndex={stintIndex}
         />
         </TrackStatusFrame>
+        <TrackMap />
+        </div>
+
+        <div className={styles.bottom}>
         <StandingsSidebar drivers={drivers} positionIndex={positionIndex} championshipDrivers={championshipDrivers} championshipTeams={championshipTeams}/>
         </div>
     </div>
