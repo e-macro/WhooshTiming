@@ -60,7 +60,7 @@ const RaceView = ({drivers, positions, intervals, laps, pits, championshipDriver
             stintIndex={stintIndex}
         />
         </TrackStatusFrame>
-        <TrackMap location={location} milestones={statusMilestones} fastestLap={fastestLap}/>
+        <TrackMap location={location} milestones={statusMilestones} fastestLap={fastestLap} sessionKey={Number(sessionKey)} sessionStartMs={sessionStartMs}/>
         </div>
 
         <div className={styles.bottom}>

@@ -60,6 +60,12 @@ export const openf1 = {
       driver_number: driverNumber,
       'date>': dateFrom,
       'date<': dateTo
+  }),
+  locationWindow: (sessionKey: number, from: string, to: string) => 
+    get<Location>('location', {
+      session_key: sessionKey,
+      'date>': from,
+      'date<': to
     })
   // NOTE: /v1/location is huge (~0.5M records per race).
   // Fetch in time windows (date>=...&date<=...) — never all at once.

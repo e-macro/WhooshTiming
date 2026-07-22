@@ -96,3 +96,4 @@ export function boundaryTick(points: {x: number, y: number}[], index: number, ha
     const nx = -dy / len, ny = dx / len
     return { x1: points[index].x - nx*halfLen, y1: points[index].y - ny*halfLen, x2: points[index].x + nx*halfLen, y2: points[index].y + ny*halfLen}
 }
+

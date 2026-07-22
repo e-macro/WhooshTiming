@@ -7,6 +7,7 @@ import type { TrackStatusMilestone } from "@/lib/replay/trackStatus";
 import { useReplayStore } from "@/store/replayStore";
 import { searchLatest, type CompletedLap } from "@/lib/replay/timeIndex";
 import { useMemo } from "react";
+import { useLocationWindows } from "@/lib/hooks/useLocationWindows";
 
 const VIEW_BOX_SIZE = 500;
 /* Track stroke is centered on the path, so half of it pokes past the
@@ -28,10 +29,12 @@ const STATUS_LABEL = {
 type Props = {
   location: Location[],
   milestones: TrackStatusMilestone[],
-  fastestLap: CompletedLap | null
+  fastestLap: CompletedLap | null,
+  sessionKey: number,
+  sessionStartMs: number,
 }
 
-export default function TrackMap({ location, milestones, fastestLap }: Props) {
+export default function TrackMap({ location, milestones, fastestLap, sessionKey, sessionStartMs }: Props) {
   const cursor = useReplayStore(s => s.cursor)
   const rec = searchLatest(milestones, cursor)
   const boundaries = useMemo(() => fastestLap ? findSectorBoundaryIndexes(location, fastestLap) : null, [location, fastestLap])
@@ -67,6 +70,9 @@ export default function TrackMap({ location, milestones, fastestLap }: Props) {
     return [startFinish, ...boundaries.map((idx) => boundaryTick(points, idx, TICK_HALF_LEN))]
   }, [points, boundaries])
   const status = rec?.status ?? 'green'
+  const windowRecords = useLocationWindows(sessionKey, sessionStartMs)
+  console.log(windowRecords.length);
+  
   // Secondary data (progressive enhancement): may still be loading.
   if (location.length === 0) {
     return (

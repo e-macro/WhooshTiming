@@ -63,6 +63,7 @@ export default function RaceClient({ sessionKey }: Props) {
     queryFn: () => openf1.meeting(session.data![0].meeting_key),
     enabled: !!session.data?.[0]
   })
+  
   const completedLap = laps.data?.filter((l): l is CompletedLap => l.lap_duration !== null) ?? []
   const fastestLap = findFastestLap(completedLap)
   const location = useQuery({
