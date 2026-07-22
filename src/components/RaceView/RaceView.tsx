@@ -66,7 +66,8 @@ const RaceView = ({drivers, positions, intervals, laps, pits, championshipDriver
             fastestLap={fastestLap} 
             sessionKey={Number(sessionKey)} 
             sessionStartMs={sessionStartMs}
-            drivers={drivers}/>
+            drivers={drivers}
+            lapIndex={lapIndex}/>
         </div>
 
         <div className={styles.bottom}>

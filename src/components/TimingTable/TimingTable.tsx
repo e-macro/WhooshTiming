@@ -2,7 +2,7 @@
 
 import type { Driver } from "@/lib/types/openf1";
 import styles from "./TimingTable.module.css";
-import { latestAt, searchLatest} from "@/lib/replay/timeIndex";
+import { isDriverOut, latestAt, searchLatest} from "@/lib/replay/timeIndex";
 import { useReplayStore } from "@/store/replayStore";
 import { formatGap, formatLapTime } from "@/lib/format";
 import type { useSessionIndexes } from "@/lib/hooks/useSessionIndexes";
@@ -49,10 +49,7 @@ export default function TimingTable({drivers, positionIndex, intervalIndex, lapI
     if (point === null) {
         continue
     }
-    const allLaps = lapIndex.get(driver.driver_number)
-    const lastLap = allLaps?.[allLaps.length - 1]
-    const lastActivity = lastLap?.t ?? 0
-    const isOut = cursor - lastActivity > OUT_THRESHOLD_MS
+    const isOut = isDriverOut(lapIndex, driver.driver_number, cursor, OUT_THRESHOLD_MS)
     rows.push({ 
       position: point.position,
       driverNumber: driver.driver_number, 

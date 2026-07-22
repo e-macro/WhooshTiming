@@ -92,3 +92,10 @@ export function buildLapMilestones(completedLaps: CompletedLap[], startMs: numbe
     }
     return laps
 }
+
+export function isDriverOut(lapIndex: Map<number, LapPoint[]>, driverNumber: number, cursorMs: number, thresholdMs: number): boolean {
+    const allLaps = lapIndex.get(driverNumber)
+    const lastLap = allLaps?.[allLaps.length - 1]
+    const lastActivity = lastLap?.t ?? 0
+    return cursorMs - lastActivity > thresholdMs
+}
