@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { atSec, makeCompletedLap, makeLocation, START } from "./testFactories";
-import { applyTransform, boundaryTick, computeTrackTransform, findFastestLap, findNearestIndex, findSectorBoundaryIndexes, normalizeTrackPoints } from "./trackMap";
+import { applyTransform, boundaryTick, carPositionAt, computeTrackTransform, findFastestLap, findNearestIndex, findSectorBoundaryIndexes, normalizeTrackPoints } from "./trackMap";
+import type { TimePoint } from "./timeIndex";
 
 describe('findFastestLap', () => {
     it('finds fastest lap', () => {
@@ -107,5 +108,55 @@ describe('boundaryTick', () => {
     it('returns a degenerate tick when neighbours coincide (zero direction)', () => {
         const points = [{ x: 5, y: 5 }, { x: 5, y: 5 }, { x: 5, y: 5 }]
         expect(boundaryTick(points, 1, 5)).toEqual({ x1: 5, y1: 5, x2: 5, y2: 5 })
+    })
+})
+
+describe('carPositionAt', () => {
+    // Points carry x/y plus the engine's `t` (ms from session start).
+    const makeIndex = (pts: TimePoint<{ x: number, y: number }>[]) =>
+        new Map<number, TimePoint<{ x: number, y: number }>[]>([[1, pts]])
+
+    it('interpolates halfway between two samples', () => {
+        const index = makeIndex([
+            { x: 0, y: 0, t: 0 },
+            { x: 10, y: 20, t: 1000 },
+        ])
+        expect(carPositionAt(index, 1, 500)).toEqual({ x: 5, y: 10 })
+    })
+
+    it('returns the exact sample when cursor sits on it', () => {
+        const index = makeIndex([
+            { x: 0, y: 0, t: 0 },
+            { x: 10, y: 20, t: 1000 },
+        ])
+        expect(carPositionAt(index, 1, 0)).toEqual({ x: 0, y: 0 })
+    })
+
+    it('freezes on the last known sample when there is no next point', () => {
+        const index = makeIndex([
+            { x: 0, y: 0, t: 0 },
+            { x: 10, y: 20, t: 1000 },
+        ])
+        expect(carPositionAt(index, 1, 5000)).toEqual({ x: 10, y: 20 })
+    })
+
+    it('returns null before the first sample', () => {
+        const index = makeIndex([{ x: 0, y: 0, t: 1000 }])
+        expect(carPositionAt(index, 1, 500)).toBe(null)
+    })
+
+    it('returns null for an unknown driver', () => {
+        const index = makeIndex([{ x: 0, y: 0, t: 0 }])
+        expect(carPositionAt(index, 99, 500)).toBe(null)
+    })
+
+    it('does not divide by zero on duplicate timestamps', () => {
+        // searchLatestIndex returns the LAST index with t <= cursor, so on a
+        // tie `a` is the later sample and `b` is undefined → freeze, no NaN.
+        const index = makeIndex([
+            { x: 0, y: 0, t: 0 },
+            { x: 10, y: 20, t: 0 },
+        ])
+        expect(carPositionAt(index, 1, 0)).toEqual({ x: 10, y: 20 })
     })
 })

@@ -1,5 +1,5 @@
 import type { Location } from "../types/openf1";
-import type { CompletedLap } from "./timeIndex";
+import { searchLatestIndex, type CompletedLap, type TimePoint } from "./timeIndex";
 
 type TrackTransform = {
     minX: number,
@@ -97,3 +97,19 @@ export function boundaryTick(points: {x: number, y: number}[], index: number, ha
     return { x1: points[index].x - nx*halfLen, y1: points[index].y - ny*halfLen, x2: points[index].x + nx*halfLen, y2: points[index].y + ny*halfLen}
 }
 
+export function carPositionAt(
+    index: Map<number, TimePoint<{ x: number, y: number}>[]>, 
+    driverNumber: number, cursorMs: number
+): { x: number, y: number} | null {
+    const points = index.get(driverNumber)
+    if(!points) return null
+    const i = searchLatestIndex(points, cursorMs)
+    if (i === -1) return null
+    const a = points[i]
+    const b = points[i + 1]
+    if (b === undefined || b.t === a.t) {
+        return { x: a.x, y: a.y }
+    } 
+    const f = (cursorMs - a.t) / (b.t - a.t)
+    return { x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f}
+}

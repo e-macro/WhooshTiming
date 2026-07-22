@@ -50,6 +50,9 @@
   width: 100%;
   height: auto;
   display: block;
+  /* Labels above edge dots may poke past the viewBox — let them spill
+     into the card padding instead of being clipped. */
+  overflow: visible;
 }
 
 /* Track outline: thick enough to read as tarmac, not a wire.
@@ -84,6 +87,26 @@
 .cut {
   stroke: var(--surface);
   stroke-width: 8;
+}
+
+/* Car dot: dark outline keeps team colours readable on any track colour */
+.car {
+  stroke: var(--bg);
+  stroke-width: 2;
+}
+
+/* Acronym chip above the dot */
+.carLabelBox {
+  fill: var(--bg);
+  opacity: 0.85;
+}
+
+.carLabel {
+  font-family: var(--font-data);
+  font-size: 9px;
+  font-weight: 700;
+  fill: var(--text);
+  text-anchor: middle;
 }
 
 /* Loading placeholder */

@@ -18,7 +18,7 @@ export function buildTimeIndex<R extends { driver_number: number}, T>(records: R
     return driver
 }
 
-export function searchLatest<P extends {t: number}>(points: P[], cursorMs: number): P | null {
+export function searchLatestIndex<P extends {t: number}>(points: P[], cursorMs: number): number {
     let lo = 0;
     let hi = points.length - 1
     let found = -1
@@ -31,6 +31,11 @@ export function searchLatest<P extends {t: number}>(points: P[], cursorMs: numbe
             hi = mid - 1
         }
     } 
+    return found
+}
+
+export function searchLatest<P extends {t: number}>(points: P[], cursorMs: number): P | null {
+    const found = searchLatestIndex(points, cursorMs)
     return found === -1 ? null : points[found]  
 }
 

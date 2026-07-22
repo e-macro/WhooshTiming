@@ -1,11 +1,11 @@
 'use client'
 
-import type { Location } from "@/lib/types/openf1";
-import { boundaryTick, findSectorBoundaryIndexes, normalizeTrackPoints } from "@/lib/replay/trackMap";
+import type { Driver, Location } from "@/lib/types/openf1";
+import { applyTransform, boundaryTick, carPositionAt, computeTrackTransform, findSectorBoundaryIndexes } from "@/lib/replay/trackMap";
 import styles from "./TrackMap.module.css";
 import type { TrackStatusMilestone } from "@/lib/replay/trackStatus";
 import { useReplayStore } from "@/store/replayStore";
-import { searchLatest, type CompletedLap } from "@/lib/replay/timeIndex";
+import { buildTimeIndex, latestAt, searchLatest, type CompletedLap } from "@/lib/replay/timeIndex";
 import { useMemo } from "react";
 import { useLocationWindows } from "@/lib/hooks/useLocationWindows";
 
@@ -30,15 +30,22 @@ type Props = {
   location: Location[],
   milestones: TrackStatusMilestone[],
   fastestLap: CompletedLap | null,
+  drivers: Driver[]
   sessionKey: number,
   sessionStartMs: number,
 }
 
-export default function TrackMap({ location, milestones, fastestLap, sessionKey, sessionStartMs }: Props) {
+export default function TrackMap({ location, milestones, fastestLap, drivers, sessionKey, sessionStartMs }: Props) {
   const cursor = useReplayStore(s => s.cursor)
   const rec = searchLatest(milestones, cursor)
+  const windowRecords = useLocationWindows(sessionKey, sessionStartMs)
+  const carIndex = useMemo(
+    () => buildTimeIndex(windowRecords, sessionStartMs, r => ({x: r.x, y: r.y}), r => new Date(r.date).getTime()),
+    [windowRecords, sessionStartMs]
+  )
+  const transform = useMemo(() => computeTrackTransform(location, VIEW_BOX_SIZE), [location])
+  const points = useMemo(() => transform === null ? [] : location.map(p => applyTransform(p, transform)), [location, transform])
   const boundaries = useMemo(() => fastestLap ? findSectorBoundaryIndexes(location, fastestLap) : null, [location, fastestLap])
-  const points = useMemo(() => normalizeTrackPoints(location, VIEW_BOX_SIZE), [location]);
   const segments = useMemo(() => {
     const toAttr = (pts: {x: number, y: number}[]) => pts.map(p => `${p.x},${p.y}`).join(" ")
     if (points.length === 0) {
@@ -70,8 +77,6 @@ export default function TrackMap({ location, milestones, fastestLap, sessionKey,
     return [startFinish, ...boundaries.map((idx) => boundaryTick(points, idx, TICK_HALF_LEN))]
   }, [points, boundaries])
   const status = rec?.status ?? 'green'
-  const windowRecords = useLocationWindows(sessionKey, sessionStartMs)
-  console.log(windowRecords.length);
   
   // Secondary data (progressive enhancement): may still be loading.
   if (location.length === 0) {
@@ -106,6 +111,20 @@ export default function TrackMap({ location, milestones, fastestLap, sessionKey,
         {ticks.map((t, i) => (
           <line key={i} x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2} className={styles.cut} />
         ))}
+        {transform && drivers.map(d => {
+          const point = carPositionAt(carIndex, d.driver_number, cursor)
+          if(point === null) return null
+          const pos = applyTransform(point, transform)
+          return (
+            <g key={d.driver_number} transform={`translate(${pos.x} ${pos.y})`}>
+              <circle r={7} fill={`#${d.team_colour}`} className={styles.car} />
+              <rect x={-15} y={-26} width={30} height={13} rx={4} className={styles.carLabelBox} />
+              <text x={0} y={-16} className={styles.carLabel}>
+                {d.name_acronym}
+              </text>
+            </g>
+          )
+        })}
       </svg>
     </section>
   );
