@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { atSec, makeCompletedLap, makeLocation, START } from "./testFactories";
-import { boundaryTick, findFastestLap, findNearestIndex, findSectorBoundaryIndexes, normalizeTrackPoints } from "./trackMap";
+import { applyTransform, boundaryTick, computeTrackTransform, findFastestLap, findNearestIndex, findSectorBoundaryIndexes, normalizeTrackPoints } from "./trackMap";
 
 describe('findFastestLap', () => {
     it('finds fastest lap', () => {
@@ -17,14 +17,40 @@ describe('findFastestLap', () => {
     })
 })
 
+describe('computeTrackTransform', () => {
+    it('returns measurement object', () => {
+        expect(computeTrackTransform([{ x: 10, y: 20}, {x: 110, y: 20}, {x: 110, y: 70}, {x: 10, y: 70}], 500))
+            .toEqual({
+                minX: 10,
+                maxY: 70,
+                scale: 5,
+                offsetX: 0,
+                offsetY: 125
+            })
+    })
+    it('returns null per empty array', () => {
+        expect(computeTrackTransform([], 500)).toEqual(null)
+    })
+})
+
+describe('applyTransform', () => {
+    it('returns transformed coordinates', () => {
+        const points = [{ x: 10, y: 20}, {x: 110, y: 20}, {x: 110, y: 70}, {x: 10, y: 70}]
+        const transform = computeTrackTransform(points, 500)
+        expect(applyTransform({x: 30, y: 40}, transform!)).toEqual({
+            x: 100, y: 275
+        })
+    })
+})
+
 describe('normalizeTrackPoints', () => {
     it('returns normalized array of coordinates', () => {
         expect(normalizeTrackPoints([{ x: 10, y: 20}, {x: 110, y: 20}, {x: 110, y: 70}, {x: 10, y: 70}], 500))
             .toEqual([
-                {x: 0, y: 250},
-                {x: 500, y: 250},
-                {x: 500, y: 0},
-                {x: 0, y: 0}
+                {x: 0, y: 375},
+                {x: 500, y: 375},
+                {x: 500, y: 125},
+                {x: 0, y: 125}
             ])
     })
     it('returns an empty array per empty array', () => {

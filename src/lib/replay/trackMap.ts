@@ -1,6 +1,14 @@
 import type { Location } from "../types/openf1";
 import type { CompletedLap } from "./timeIndex";
 
+type TrackTransform = {
+    minX: number,
+    maxY: number,
+    scale: number,
+    offsetX: number,
+    offsetY: number
+}
+
 export function findFastestLap(completedLaps: CompletedLap[]): CompletedLap | null {
     let best: CompletedLap | null = null
     for (const lap of completedLaps) {
@@ -11,12 +19,12 @@ export function findFastestLap(completedLaps: CompletedLap[]): CompletedLap | nu
     return best
 }
 
-export function normalizeTrackPoints(
+export function computeTrackTransform(
     points: { x: number, y: number}[],
     viewBoxSize: number
-): { x: number, y: number }[] {
+): TrackTransform | null {
     if(points.length === 0) {
-        return []
+        return null
     }
     let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity
     for (const p of points) {
@@ -36,7 +44,22 @@ export function normalizeTrackPoints(
     const width = maxX - minX, height = maxY - minY
     const scale = viewBoxSize / Math.max(width, height)
     const offsetX = (viewBoxSize - width * scale) / 2, offsetY = (viewBoxSize - height * scale) / 2
-    return points.map(p => ({ x: (p.x - minX) * scale + offsetX, y: (maxY - p.y) * scale + offsetY}))
+    return {minX, maxY, scale, offsetX, offsetY}
+}
+
+export function applyTransform(p: {x: number, y: number}, t: TrackTransform): {x: number, y: number} {
+    return { x: (p.x - t.minX) * t.scale + t.offsetX, y: (t.maxY - p.y) * t.scale + t.offsetY}
+}
+
+export function normalizeTrackPoints(
+    points: { x: number, y: number}[],
+    viewBox: number
+): { x: number, y: number }[] {
+    const transform = computeTrackTransform(points, viewBox)
+    if (transform === null) {
+        return []
+    }
+    return points.map(p => applyTransform(p, transform))
 }
 
 export function findNearestIndex(points: Location[], targetMs: number): number {
