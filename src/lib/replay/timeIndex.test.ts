@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { annotatePb, buildLapMilestones, buildSessionBest, buildTimeIndex, isDriverOut, searchLatest, type LapPoint } from "./timeIndex";
+import { annotatePb, buildLapMilestones, buildSessionBest, buildTimeIndex, isDriverOut, searchLatest, type LapMilestone, type LapPoint } from "./timeIndex";
 import type { Position } from "../types/openf1";
 import { makeCompletedLap } from "./testFactories";
 
@@ -138,15 +138,29 @@ describe('buildLapMilestones', () => {
 })
 
 describe('isDriverOut', () => {
+    const milestones: LapMilestone[] = Array.from({length: 9}, (_, i) => ({
+        t: (i+1)*1000,
+        lapNumber: i + 1
+    }))
     const makeIndex = (points: LapPoint[]) => new Map<number, LapPoint[]>([[1, points]])
-    it('returns boolean depends on drivers activity', () => {
-        const index = makeIndex([
-            makeLapPoint({ t: 0}),
-            makeLapPoint({ t: 100000})
+    it('driver keeping pace is not out', () => {
+        const idx = makeIndex([
+            makeLapPoint({t: 8000}),
+            makeLapPoint({t: 9000})
         ])
-        expect(isDriverOut(index, 1, 110000, 180000)).toBe(false)
-        expect(isDriverOut(index, 1, 400000, 180000)).toBe(true)
-        expect(isDriverOut(index, 1, 180000, 180000)).toBe(false)
-        expect(isDriverOut(makeIndex([]), 1, 400000, 180000)).toBe(true)
+        expect(isDriverOut(idx, milestones, 1, 9500, 3)).toBe(false)
+    })
+    it('lapped-but-running driver is not out regardless of lap number', () => {
+        const idx = makeIndex([
+            makeLapPoint({t: 9000, lapNumber: 2})
+        ])
+        expect(isDriverOut(idx, milestones, 1, 9500, 3)).toBe(false)
+    })
+    it('stopped driver is out', () => {
+        const idx = makeIndex([makeLapPoint({t: 2000})])
+        expect(isDriverOut(idx, milestones, 1, 9500, 3)).toBe(true)
+    })
+    it('driver with no laps is not out before the leader gets going', () => {
+        expect(isDriverOut(makeIndex([]), milestones, 1, 500, 3)).toBe(false)
     })
 })

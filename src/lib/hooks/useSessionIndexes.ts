@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import type { Interval, Lap, Pit, Position, Stint } from "../types/openf1";
-import { annotatePb, buildSessionBest, buildTimeIndex, type CompletedLap } from "../replay/timeIndex";
+import { annotatePb, buildLapMilestones, buildSessionBest, buildTimeIndex, type CompletedLap } from "../replay/timeIndex";
 import { buildStintIndex } from "../replay/stints";
 
 export function useSessionIndexes(positions: Position[], intervals: Interval[], laps:Lap[], pits: Pit[], stints: Stint[], sessionStartMs: number) {
@@ -15,5 +15,6 @@ export function useSessionIndexes(positions: Position[], intervals: Interval[], 
     const sessionBest = useMemo(() => buildSessionBest(completedLaps, sessionStartMs), [completedLaps, sessionStartMs])
     const pitIndex = useMemo(() => buildTimeIndex(pits, sessionStartMs, r => ({pitDuration: r.pit_duration}), r => new Date(r.date).getTime() - r.pit_duration * 1000), [pits, sessionStartMs])
     const stintIndex = useMemo(() => buildStintIndex(stints), [stints])
-    return { positionIndex, intervalIndex, lapIndex, sessionBest, completedLaps, pitIndex, stintIndex }
+    const lapMilestones = useMemo(() => buildLapMilestones(completedLaps, sessionStartMs), [completedLaps, sessionStartMs])
+    return { positionIndex, intervalIndex, lapIndex, sessionBest, completedLaps, pitIndex, stintIndex, lapMilestones }
 }

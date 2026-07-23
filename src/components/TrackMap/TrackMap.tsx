@@ -5,7 +5,7 @@ import { applyTransform, boundaryTick, carPositionAt, computeTrackTransform, fin
 import styles from "./TrackMap.module.css";
 import type { TrackStatusMilestone } from "@/lib/replay/trackStatus";
 import { useReplayStore } from "@/store/replayStore";
-import { buildTimeIndex, isDriverOut, searchLatest, type CompletedLap } from "@/lib/replay/timeIndex";
+import { buildTimeIndex, isDriverOut, LAP_THRESHOLD, searchLatest, type CompletedLap, type LapMilestone } from "@/lib/replay/timeIndex";
 import { useMemo } from "react";
 import { useLocationWindows } from "@/lib/hooks/useLocationWindows";
 import type { useSessionIndexes } from "@/lib/hooks/useSessionIndexes";
@@ -17,7 +17,6 @@ const VIEW_BOX_PAD = 12;
 /* Sector-boundary cut: half-length of the background-coloured tick that
    "erases" a constant-width slice of the stroke (track is 10 wide). */
 const TICK_HALF_LEN = 9;
-const OUT_THRESHOLD_MS = 180000
 
 /* Broadcast-style status wording (timing-screen terms stay English). */
 const STATUS_LABEL = {
@@ -33,12 +32,13 @@ type Props = {
   milestones: TrackStatusMilestone[],
   fastestLap: CompletedLap | null,
   drivers: Driver[],
-  lapIndex: ReturnType<typeof useSessionIndexes>['lapIndex']
+  lapIndex: ReturnType<typeof useSessionIndexes>['lapIndex'],
+  lapMilestones: LapMilestone[]
   sessionKey: number,
   sessionStartMs: number,
 }
 
-export default function TrackMap({ location, milestones, fastestLap, drivers, lapIndex, sessionKey, sessionStartMs }: Props) {
+export default function TrackMap({ location, milestones, fastestLap, drivers, lapIndex, lapMilestones, sessionKey, sessionStartMs }: Props) {
   const cursor = useReplayStore(s => s.cursor)
   const rec = searchLatest(milestones, cursor)
   const windowRecords = useLocationWindows(sessionKey, sessionStartMs)
@@ -115,7 +115,7 @@ export default function TrackMap({ location, milestones, fastestLap, drivers, la
           <line key={i} x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2} className={styles.cut} />
         ))}
         {transform && drivers.map(d => {
-          if(isDriverOut(lapIndex, d.driver_number, cursor, OUT_THRESHOLD_MS)) return null
+          if(isDriverOut(lapIndex, lapMilestones, d.driver_number, cursor, LAP_THRESHOLD)) return null
           const point = carPositionAt(carIndex, d.driver_number, cursor)
           if(point === null) return null
           const pos = applyTransform(point, transform)

@@ -2,7 +2,7 @@
 
 import type { Driver } from "@/lib/types/openf1";
 import styles from "./TimingTable.module.css";
-import { isDriverOut, latestAt, searchLatest} from "@/lib/replay/timeIndex";
+import { isDriverOut, LAP_THRESHOLD, latestAt, searchLatest, type LapMilestone} from "@/lib/replay/timeIndex";
 import { useReplayStore } from "@/store/replayStore";
 import { formatGap, formatLapTime } from "@/lib/format";
 import type { useSessionIndexes } from "@/lib/hooks/useSessionIndexes";
@@ -29,12 +29,11 @@ type Props = {
   lapIndex: ReturnType<typeof useSessionIndexes>['lapIndex'],
   sessionBest: ReturnType<typeof useSessionIndexes>['sessionBest']
   pitIndex: ReturnType<typeof useSessionIndexes>['pitIndex'],
-  stintIndex: ReturnType<typeof useSessionIndexes>['stintIndex']
+  stintIndex: ReturnType<typeof useSessionIndexes>['stintIndex'],
+  lapMilestones: LapMilestone[]
 }
 
-const OUT_THRESHOLD_MS = 180000
-
-export default function TimingTable({drivers, positionIndex, intervalIndex, lapIndex, pitIndex, sessionBest, stintIndex}: Props) {
+export default function TimingTable({drivers, positionIndex, intervalIndex, lapIndex, pitIndex, sessionBest, stintIndex, lapMilestones}: Props) {
   const cursor = useReplayStore(s => s.cursor)
   const rec = searchLatest(sessionBest, cursor)
   const rows: TimingRow[] = []
@@ -49,7 +48,7 @@ export default function TimingTable({drivers, positionIndex, intervalIndex, lapI
     if (point === null) {
         continue
     }
-    const isOut = isDriverOut(lapIndex, driver.driver_number, cursor, OUT_THRESHOLD_MS)
+    const isOut = isDriverOut(lapIndex, lapMilestones, driver.driver_number, cursor, LAP_THRESHOLD)
     rows.push({ 
       position: point.position,
       driverNumber: driver.driver_number, 
