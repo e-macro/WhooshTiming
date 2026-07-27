@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { atSec, makeCompletedLap, makeLocation, START } from "./testFactories";
-import { applyTransform, boundaryTick, carPositionAt, computeTrackTransform, findFastestLap, findNearestIndex, findSectorBoundaryIndexes, normalizeTrackPoints } from "./trackMap";
+import { applyTransform, boundaryTick, carPositionAt, computeTrackTransform, findFastestLap, findNearestIndex, findSectorBoundaryIndexes, hasUsableOutline, normalizeTrackPoints } from "./trackMap";
 import type { TimePoint } from "./timeIndex";
+import { MIN_OUTLINE_UNIQUE_RATIO } from "./trackMap";
 
 describe('findFastestLap', () => {
     it('finds fastest lap', () => {
@@ -158,5 +159,33 @@ describe('carPositionAt', () => {
             { x: 10, y: 20, t: 0 },
         ])
         expect(carPositionAt(index, 1, 0)).toEqual({ x: 10, y: 20 })
+    })
+})
+
+describe('hasUsableOutline', () => {
+    it('returns true for higher than minimal ratio value', () => {
+        const arr = [
+            { x: 1, y: 2}, 
+            { x: 2, y: 3},
+            { x: 3, y: 4},
+            { x: 1, y: 2}
+        ]
+        expect(hasUsableOutline(arr, MIN_OUTLINE_UNIQUE_RATIO)).toBe(true)
+    })
+    it('returns false for lower than minimal ratio value', () => {
+        const arr = Array.from({length: 30}, (_, i) => ({ x: i % 3, y: 0}))
+        expect(hasUsableOutline(arr, MIN_OUTLINE_UNIQUE_RATIO)).toBe(false)
+    })
+    it('returns false on upper limit of ratio value', () => {
+        const arr = [
+            { x: 1, y: 2}, 
+            { x: 2, y: 3},
+            { x: 1, y: 2},
+            { x: 2, y: 3}
+        ]
+        expect(hasUsableOutline(arr, MIN_OUTLINE_UNIQUE_RATIO)).toBe(false)
+    })
+    it('returns false on empty array', () => {
+        expect(hasUsableOutline([], MIN_OUTLINE_UNIQUE_RATIO)).toBe(false)
     })
 })

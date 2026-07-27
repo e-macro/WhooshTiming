@@ -3,6 +3,7 @@ import Link from "next/link";
 import { openf1 } from "@/lib/api/openf1";
 import styles from "./standings.module.css";
 import { findLastPastSession } from "@/lib/models/race";
+import { parseSeason, SEASONS } from "@/lib/seasons";
 
 type Props = {
   searchParams: Promise<{ season?: string }>
@@ -20,8 +21,6 @@ type TeamStandingsRow = {
   teamColor: string,
   points: number
 }
-
-const SEASONS = [2023, 2024, 2025, 2026]
 
 function initials(fullName: string): string {
   return fullName
@@ -105,8 +104,7 @@ function TeamsTable({ rows }: { rows: TeamStandingsRow[] }) {
 
 export default async function StandingsPage({ searchParams }: Props) {
   const { season } = await searchParams
-  const raw = Number(season)
-  const validSeason = SEASONS.includes(raw) ? raw : SEASONS.at(-1)!
+  const validSeason = parseSeason(season)
   // eslint-disable-next-line react-hooks/purity
   const nowMs = Date.now()
   const sessions = await openf1.raceSessions(validSeason)

@@ -1,6 +1,11 @@
 import type { Location } from "../types/openf1";
 import { searchLatestIndex, type CompletedLap, type TimePoint } from "./timeIndex";
 
+/* This ratio must correspond with real issues when DB gave 
+a lot less unique values than points itself so ratio might be << 0.5
+while healthy data is mostly at 1.0 value in total*/
+export const MIN_OUTLINE_UNIQUE_RATIO = 0.5
+
 type TrackTransform = {
     minX: number,
     maxY: number,
@@ -112,4 +117,13 @@ export function carPositionAt(
     } 
     const f = (cursorMs - a.t) / (b.t - a.t)
     return { x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f}
+}
+
+export function hasUsableOutline(points: {x: number, y: number}[], minUniqueRatio: number): boolean {
+    const total = points.length
+    if (total === 0) {
+        return false
+    }
+    const unique = new Set(points.map(p => `${p.x},${p.y}`))
+    return unique.size / total > minUniqueRatio
 }

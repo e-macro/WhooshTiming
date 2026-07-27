@@ -3,9 +3,6 @@ import type { RaceControl } from "../types/openf1";
 import { buildTrackStatus } from "./trackStatus";
 import { atSec, START } from "./testFactories";
 
-
-
-
 const makeMessage = (overrides: Partial<RaceControl> = {}): RaceControl => ({
     category: 'flag',
     date: '2026-01-01T00:00:00+00:00',

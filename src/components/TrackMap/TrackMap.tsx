@@ -1,7 +1,7 @@
 'use client'
 
 import type { Driver, Location } from "@/lib/types/openf1";
-import { applyTransform, boundaryTick, carPositionAt, computeTrackTransform, findSectorBoundaryIndexes } from "@/lib/replay/trackMap";
+import { applyTransform, boundaryTick, carPositionAt, computeTrackTransform, findSectorBoundaryIndexes, hasUsableOutline, MIN_OUTLINE_UNIQUE_RATIO } from "@/lib/replay/trackMap";
 import styles from "./TrackMap.module.css";
 import type { TrackStatusMilestone } from "@/lib/replay/trackStatus";
 import { useReplayStore } from "@/store/replayStore";
@@ -46,6 +46,7 @@ export default function TrackMap({ location, milestones, fastestLap, drivers, la
     () => buildTimeIndex(windowRecords, sessionStartMs, r => ({x: r.x, y: r.y}), r => new Date(r.date).getTime()),
     [windowRecords, sessionStartMs]
   )
+  const isUsable = useMemo(() => hasUsableOutline(location, MIN_OUTLINE_UNIQUE_RATIO), [location])
   const transform = useMemo(() => computeTrackTransform(location, VIEW_BOX_SIZE), [location])
   const points = useMemo(() => transform === null ? [] : location.map(p => applyTransform(p, transform)), [location, transform])
   const boundaries = useMemo(() => fastestLap ? findSectorBoundaryIndexes(location, fastestLap) : null, [location, fastestLap])
@@ -87,6 +88,14 @@ export default function TrackMap({ location, milestones, fastestLap, drivers, la
       <section className={`card ${styles.placeholder}`} aria-label="Карта траси">
         <span className={styles.heading}>Карта траси</span>
         <p className={styles.text}>Завантажується контур траси…</p>
+      </section>
+    );
+  }
+  if (!isUsable) {
+    return (
+      <section className={`card ${styles.placeholder}`} aria-label="Карта траси">
+        <span className={styles.heading}>Карта траси</span>
+        <p className={styles.text}>Джерело даних віддає неповні дані для цієї сесії</p>
       </section>
     );
   }

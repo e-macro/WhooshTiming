@@ -4,17 +4,17 @@ import { openf1 } from "@/lib/api/openf1";
 import type { Session } from "@/lib/types/openf1";
 import { toRaceListItem, type RaceListItem } from "@/lib/models/race";
 import Link from "next/link";
+import { parseSeason, SEASONS } from "@/lib/seasons";
 
 type Props = {
   searchParams: Promise<{ season?: string }>
 }
 
-const SEASONS = [2023, 2024, 2025, 2026]
+
 
 export default async function RacesPage({ searchParams }: Props) {
   const { season } = await searchParams
-  const raw = Number(season)
-  const validSeason = SEASONS.includes(raw) ? raw : SEASONS.at(-1)!
+  const validSeason = parseSeason(season)
   // Request time: this is a server component, rendered once per request —
   // Date.now() here is a per-request input, not a render-instability source.
   // eslint-disable-next-line react-hooks/purity
