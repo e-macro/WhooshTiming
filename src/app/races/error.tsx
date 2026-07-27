@@ -6,8 +6,10 @@ import { useEffect } from "react"
 
 export default function ErrorPage({
   error,
+  reset
 }: {
-  error: Error & { digest?: string }
+  error: Error & { digest?: string };
+  reset: () => void
 }) {
   useEffect(() => {
     // Log the error to an error reporting service
@@ -16,13 +18,22 @@ export default function ErrorPage({
 
   return(
     <div className={styles.wrap}>
-      <p className={`${styles.code} tnum`}>401</p>
       <h1 className={styles.title}>Ця сторінка зійшла з дистанції</h1>
-      <p className={styles.hint}>Ймовірно зараз йде активна сесія гонки - історичні повтори інших сесій недоступні.</p>
-      <Link href="/" className={styles.back}>
-        Повернутись у бокси
-      </Link>
+      <p className={styles.hint}>
+        Не вдалося завантажити дані. Можливо, зараз триває сесія Формули 1 — тоді джерело
+        закриває доступ навіть до архівних гонок. Або це технічний збій.
+      </p>
+      <div className={styles.actions}>
+        <button type="button" onClick={reset} className={styles.retry}>
+          Спробувати ще раз
+        </button>
+        <Link href="/" className={styles.back}>
+          Повернутись у бокси
+        </Link>
+      </div>
+      {error.digest && (
+        <p className={`${styles.digest} tnum`}>Код помилки: {error.digest}</p>
+      )}
     </div>
   )
 }
-

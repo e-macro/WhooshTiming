@@ -9,13 +9,6 @@
   padding: 0 24px;
 }
 
-.code {
-  font-size: 96px;
-  font-weight: 700;
-  color: var(--text-faint);
-  line-height: 1;
-}
-
 .title {
   font-size: 28px;
   font-weight: 700;
@@ -23,10 +16,20 @@
 
 .hint {
   color: var(--text-dim);
+  max-width: 520px;
 }
 
-.back {
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   margin-top: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Primary action: retrying is what the user most likely wants */
+.retry {
   padding: 10px 22px;
   border-radius: var(--squircle-md);
   background: var(--accent);
@@ -34,6 +37,27 @@
   font-weight: 600;
 }
 
-.back:hover {
+.retry:hover {
   background: var(--accent-hover);
+}
+
+/* Secondary action: leaving the page */
+.back {
+  padding: 10px 22px;
+  border-radius: var(--squircle-md);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.back:hover {
+  color: var(--text);
+  border-color: var(--text-faint);
+}
+
+/* Support reference, not a headline: pairs the user's screen with server logs */
+.digest {
+  margin-top: 20px;
+  font-size: 11px;
+  color: var(--text-faint);
 }
