@@ -30,9 +30,13 @@
   font-size: 15px;
 }
 
+/* Text of different sizes (14px acronym, 12px number) must share a BASELINE —
+   centring their boxes makes one look high and the other low, because their
+   cap heights differ. Boxes that aren't text (bar, tyre, PIT) opt back into
+   centring via align-self below. */
 .driver {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 10px;
   min-width: 0;
 }
@@ -43,14 +47,33 @@
   height: 20px;
   border-radius: 2px;
   flex-shrink: 0;
+  align-self: center;
+}
+
+/* Fixed-width fields: the acronym is set in a proportional face and the number
+   is 1-2 digits, so without reserved widths every following item (tyre badge,
+   age, PIT) drifts horizontally row to row — and lands on fractional pixels,
+   which makes centred glyphs inside it round in different directions. */
+.acronym {
+  width: 40px;
+  flex-shrink: 0;
 }
 
 .num {
+  width: 18px;
+  text-align: right;
+  flex-shrink: 0;
+  color: var(--text-faint);
+  font-size: 12px;
+}
+
+.tyreAge {
   color: var(--text-faint);
   font-size: 12px;
 }
 
 .pit {
+  align-self: center;
   font-family: var(--font-data);
   font-size: 10px;
   letter-spacing: 0.08em;
@@ -64,15 +87,29 @@
 .tyre {
   --tyre-c: var(--text-faint); /* fallback for unknown compounds */
   position: relative;
-  width: 18px;
-  height: 18px;
-  display: grid;
-  place-items: center;
+  /* 19px, not 18: the baseline flex line is 21px tall, so an even size would
+     centre on a half-pixel and make the glyph inside land off-grid. */
+  width: 19px;
+  height: 19px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
   font-family: var(--font-data);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   color: var(--tyre-c);
   flex-shrink: 0;
+}
+
+/* The letter needs its own element: text-box-trim applies to the block
+   container that holds the text, and inside a flex parent the bare text node
+   lives in an anonymous item the property can't reach. Trimming the box down
+   to cap height is what makes the glyph itself — not its ascender/descender
+   padding — the thing flex centres. Unsupported browsers keep the old look. */
+.tyreLetter {
+  line-height: 1;
+  text-box: trim-both cap alphabetic;
 }
 
 .tyre::before {
@@ -81,10 +118,12 @@
   inset: 0;
   border-radius: 50%;
   padding: 2px;
+  /* Four arcs with gaps at 45/135/225/315deg: symmetric about both axes, so
+     the ring adds no optical pull that would make the letter look off-centre. */
   background: repeating-conic-gradient(
-    from 15deg,
-    var(--tyre-c) 0 80deg,
-    transparent 80deg 120deg
+    from 55deg,
+    var(--tyre-c) 0 70deg,
+    transparent 70deg 90deg
   );
   mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   mask-composite: exclude;

@@ -19,6 +19,7 @@ type TimingRow = {
   lapState: "fastest" | "pb" | "normal";
   inPit: boolean;
   compound: string | null,
+  tyreAge: number | null,
   isOut: boolean
 };
 
@@ -66,6 +67,7 @@ export default function TimingTable({drivers, positionIndex, intervalIndex, lapI
               : 'normal',
       inPit: pit !== null && cursor <= pit.t + pit.pitDuration * 1000,
       compound,
+      tyreAge: stint && lap ? stint.tyre_age_at_start + (lap.lapNumber - stint.lap_start) : null,
       isOut
     })
   }
@@ -85,13 +87,14 @@ export default function TimingTable({drivers, positionIndex, intervalIndex, lapI
           <span className={`${styles.pos} tnum`}>{row.position}</span>
           <span className={styles.driver}>
             <i className={styles.teamBar} style={{ background: row.teamColor }} />
-            <b>{row.acronym}</b>
+            <b className={styles.acronym}>{row.acronym}</b>
             <span className={`${styles.num} tnum`}>{row.driverNumber}</span>
             {row.compound && (
               <span className={styles.tyre} data-compound={row.compound} title={row.compound}>
-                {row.compound[0]}
+                <span className={styles.tyreLetter}>{row.compound[0]}</span>
               </span>
             )}
+            {row.tyreAge !== null && <span className={`${styles.tyreAge} tnum`}>{row.tyreAge} L</span>}
             {row.inPit && <span className={styles.pit}>PIT</span>}
           </span>
           <span className={`${styles.right} tnum`}>{row.gap}</span>
