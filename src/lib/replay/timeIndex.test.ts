@@ -94,8 +94,8 @@ describe('buildSessionBest', () => {
         ]
         const best = buildSessionBest(laps, START)
         expect(best).toEqual([
-            { t: 90000, best: 90},
-            { t: 3685000, best: 85}
+            { t: 90000, best: 90, driverNumber: 1, lapNumber: 1},
+            { t: 3685000, best: 85, driverNumber: 1, lapNumber: 1}
         ])
     })
 })

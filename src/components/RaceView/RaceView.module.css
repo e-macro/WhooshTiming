@@ -40,6 +40,14 @@
   }
 }
 
+/* Right column of the top row: map with the fastest-lap panel beneath it */
+.mapColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
 /* Bottom row: standings, full width — reference info, not time-critical */
 .bottom {
   width: 100%;

@@ -60,18 +60,20 @@ export function annotatePb(index: Map<number, LapPoint[]>) {
     }
 }
 
-export function buildSessionBest(completedLaps: CompletedLap[], startMs: number): {t: number, best: number}[] {
+export function buildSessionBest(completedLaps: CompletedLap[], startMs: number): {t: number, best: number, driverNumber: number, lapNumber: number}[] {
     const points = completedLaps.map(l => ({
         t: new Date(l.date_start).getTime() + l.lap_duration * 1000 - startMs,
-        duration: l.lap_duration
+        duration: l.lap_duration,
+        driverNumber: l.driver_number,
+        lapNumber: l.lap_number
     }))
     points.sort((a, b) => a.t - b.t)
-    const result: {t: number, best: number}[] = []
+    const result: {t: number, best: number, driverNumber: number, lapNumber: number}[] = []
     let best = Infinity
     for (const p of points) {
         if (p.duration < best) {
             best = p.duration
-            result.push({t: p.t, best: p.duration})
+            result.push({t: p.t, best: p.duration, driverNumber: p.driverNumber, lapNumber: p.lapNumber})
         }
     }
     return result

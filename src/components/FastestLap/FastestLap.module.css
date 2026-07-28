@@ -1,0 +1,65 @@
+.wrap {
+  padding: 14px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.heading {
+  font-family: var(--font-data);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+}
+
+/* Same baseline rule as the timing rows: mixed type sizes share a baseline,
+   non-text boxes opt back into centring. */
+.body {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.teamBar {
+  width: 3px;
+  height: 18px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.driver {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.acronym {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.num {
+  color: var(--text-faint);
+  font-size: 12px;
+}
+
+/* Purple: the same semantics as the fastest-lap time in the timing table */
+.time {
+  margin-left: auto;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--time-fastest);
+}
+
+.lap {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.empty {
+  color: var(--text-faint);
+  font-size: 14px;
+}

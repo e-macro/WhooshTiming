@@ -9,6 +9,7 @@ import { useMemo } from 'react';
 import { buildTrackStatus } from '@/lib/replay/trackStatus';
 import TrackStatusFrame from '../TrackStatusFrame/TrackStatusFrame';
 import TrackMap from '../TrackMap/TrackMap';
+import FastestLap from '../FastestLap/FastestLap';
 import type { CompletedLap } from '@/lib/replay/timeIndex';
 
 type Props = {
@@ -61,15 +62,18 @@ const RaceView = ({drivers, positions, intervals, laps, pits, championshipDriver
             lapMilestones={lapMilestones}
         />
         </TrackStatusFrame>
-        <TrackMap 
-            location={location} 
+        <div className={styles.mapColumn}>
+        <TrackMap
+            location={location}
             milestones={statusMilestones}
-            fastestLap={fastestLap} 
-            sessionKey={Number(sessionKey)} 
+            fastestLap={fastestLap}
+            sessionKey={Number(sessionKey)}
             sessionStartMs={sessionStartMs}
             drivers={drivers}
             lapIndex={lapIndex}
             lapMilestones={lapMilestones}/>
+        <FastestLap sessionBest={sessionBest} drivers={drivers} />
+        </div>
         </div>
 
         <div className={styles.bottom}>
