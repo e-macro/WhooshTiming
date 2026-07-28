@@ -18,6 +18,7 @@ export default function ReplayControls() {
   const seek = useReplayStore(s => s.seek)
   const progress = duration > 0 ? (cursor / duration)*100 : 0
   const isDraggingRef = useRef(false)
+  const wasPlayingRef = useRef(false)
   function seekFromPointer(e: React.MouseEvent<HTMLDivElement>) {
     const rect = e.currentTarget.getBoundingClientRect();
     const sub = (e.clientX - rect.left) / rect.width
@@ -35,10 +36,13 @@ export default function ReplayControls() {
           }}
           onPointerDown={e => {e.currentTarget.setPointerCapture(e.pointerId)
             isDraggingRef.current = true
+            wasPlayingRef.current = isPlaying
+            pause()
           }}
           onPointerUp={e => {
             e.currentTarget.releasePointerCapture(e.pointerId)
             isDraggingRef.current = false
+            if (wasPlayingRef.current) play()
           }}
           onPointerMove={e => {
             if (!isDraggingRef.current) return
