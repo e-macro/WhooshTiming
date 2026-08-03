@@ -36,9 +36,10 @@ type Props = {
   lapMilestones: LapMilestone[]
   sessionKey: number,
   sessionStartMs: number,
+  outlineFailed: boolean
 }
 
-export default function TrackMap({ location, milestones, fastestLap, drivers, lapIndex, lapMilestones, sessionKey, sessionStartMs }: Props) {
+export default function TrackMap({ location, milestones, fastestLap, drivers, lapIndex, lapMilestones, sessionKey, sessionStartMs, outlineFailed }: Props) {
   const cursor = useReplayStore(s => s.cursor)
   const rec = searchLatest(milestones, cursor)
   const windowRecords = useLocationWindows(sessionKey, sessionStartMs)
@@ -81,21 +82,16 @@ export default function TrackMap({ location, milestones, fastestLap, drivers, la
     return [startFinish, ...boundaries.map((idx) => boundaryTick(points, idx, TICK_HALF_LEN))]
   }, [points, boundaries])
   const status = rec?.status ?? 'green'
-  
-  // Secondary data (progressive enhancement): may still be loading.
-  if (location.length === 0) {
+  const outlineProblem = 
+      outlineFailed ? 'Карта траси недоступна для цієї сесії' //HTTP 404
+    : location.length === 0 ? 'Завантажується контур траси...' //Loading
+    : !isUsable ? 'Карта траси недоступна для цієї сесії' //DB gives bad data
+    : null
+  if (outlineProblem) {
     return (
       <section className={`card ${styles.placeholder}`} aria-label="Карта траси">
         <span className={styles.heading}>Карта траси</span>
-        <p className={styles.text}>Завантажується контур траси…</p>
-      </section>
-    );
-  }
-  if (!isUsable) {
-    return (
-      <section className={`card ${styles.placeholder}`} aria-label="Карта траси">
-        <span className={styles.heading}>Карта траси</span>
-        <p className={styles.text}>Джерело даних віддає неповні дані для цієї сесії</p>
+        <p className={styles.text}>{outlineProblem}</p>
       </section>
     );
   }

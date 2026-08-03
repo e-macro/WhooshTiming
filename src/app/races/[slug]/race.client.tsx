@@ -119,6 +119,7 @@ export default function RaceClient({ sessionKey }: Props) {
     sessionKey={sessionKey} 
     totalLaps={totalLaps} 
     sessionStartMs={startMs}
+    outlineFailed={location.isError}
     />
   );
 }

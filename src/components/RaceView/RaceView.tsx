@@ -29,10 +29,11 @@ type Props = {
     sessionName: string,
     sessionStartMs: number,
     totalLaps: number,
-    sessionKey: string
+    sessionKey: string,
+    outlineFailed: boolean,
 }
 
-const RaceView = ({drivers, positions, intervals, laps, pits, championshipDrivers, championshipTeams, raceControl, stints, location, fastestLap, meetingName, sessionName, sessionStartMs, totalLaps, sessionKey}: Props) => {
+const RaceView = ({drivers, positions, intervals, laps, pits, championshipDrivers, championshipTeams, raceControl, stints, location, fastestLap, meetingName, sessionName, sessionStartMs, totalLaps, sessionKey, outlineFailed}: Props) => {
     const { positionIndex, intervalIndex, lapIndex, sessionBest, completedLaps, pitIndex, stintIndex, lapMilestones } = useSessionIndexes(positions, intervals, laps, pits, stints, sessionStartMs)
     const statusMilestones = useMemo(() => buildTrackStatus(raceControl, sessionStartMs), [raceControl, sessionStartMs])
     return (
@@ -74,7 +75,8 @@ const RaceView = ({drivers, positions, intervals, laps, pits, championshipDriver
             sessionStartMs={sessionStartMs}
             drivers={drivers}
             lapIndex={lapIndex}
-            lapMilestones={lapMilestones}/>
+            lapMilestones={lapMilestones}
+            outlineFailed={outlineFailed}/>
         <FastestLap sessionBest={sessionBest} drivers={drivers} />
         </div>
         </div>
