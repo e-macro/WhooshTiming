@@ -81,10 +81,11 @@ export default function TelemetryClient({ sessionKey }: Props) {
         .flatMap(s => s.points)
         .reduce((acc, p) => Math.max(acc, p.value), 0)
     const yMaxSpeed = Math.ceil(maxSpeed / 50) * 50
-    const markers = entries[0].lap && entries[0].lap.duration_sector_1 && entries[0].lap.duration_sector_2 
+    const first = entries[0]
+    const markers = first?.lap.duration_sector_1 && first.lap.duration_sector_2 
     ? [
-        { t: entries[0].lap.duration_sector_1 * 1000, label: 'S2' },
-        { t: (entries[0].lap.duration_sector_1 + entries[0].lap.duration_sector_2) * 1000, label: 'S3' },
+        { t: first.lap.duration_sector_1 * 1000, label: 'S2' },
+        { t: (first.lap.duration_sector_1 + first.lap.duration_sector_2) * 1000, label: 'S3' },
     ]
     : []
     const state = queryStateOf([drivers, laps])
@@ -94,7 +95,7 @@ export default function TelemetryClient({ sessionKey }: Props) {
     if (state.isError) {
         return <QueryStateCard variant="error" text="Ох йойки! Щось пішло не так. Скоро вирішимо проблему!" />
     }
-    const lapDuration = (entries[0].lap?.lap_duration ?? 0) * 1000
+    const lapDuration = (first?.lap.lap_duration ?? 0) * 1000
     return (<div className={styles.page}>
         <div className={styles.head}>
             <div>
@@ -137,7 +138,9 @@ export default function TelemetryClient({ sessionKey }: Props) {
                     })}
                 </div>
         </div>
-        <div className={styles.charts}>
+        {entries.length === 0
+        ?   <p className={styles.empty}>Для цього вибору немає телеметрії</p>
+        :   <div className={styles.charts}>
             <TelemetryChart
                 series={speedSeries}
                 xMax={lapDuration}
@@ -170,6 +173,6 @@ export default function TelemetryClient({ sessionKey }: Props) {
                 hoverT={hoverT}
                 onHoverChange={setHoverT}
             />
-        </div>
+        </div>}
     </div>)
 }
