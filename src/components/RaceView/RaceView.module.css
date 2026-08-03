@@ -26,6 +26,34 @@
   font-weight: 700;
 }
 
+/* Title block and the telemetry link travel together, so the lap counter
+   still gets pushed to the far right by the header's space-between. */
+.headLeft {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.linkButton {
+  font-family: var(--font-data);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: var(--squircle-sm);
+  padding: 7px 14px;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.linkButton:hover {
+  color: var(--text);
+  background: var(--surface-raised);
+  border-color: var(--text-faint);
+}
+
 /* Top row: timing (needs room for its own columns) + map, side by side */
 .top {
   display: grid;

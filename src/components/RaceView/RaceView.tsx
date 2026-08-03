@@ -11,6 +11,7 @@ import TrackStatusFrame from '../TrackStatusFrame/TrackStatusFrame';
 import TrackMap from '../TrackMap/TrackMap';
 import FastestLap from '../FastestLap/FastestLap';
 import type { CompletedLap } from '@/lib/replay/timeIndex';
+import Link from 'next/link';
 
 type Props = {
     drivers: Driver[],
@@ -37,13 +38,15 @@ const RaceView = ({drivers, positions, intervals, laps, pits, championshipDriver
     return (
     <div className={styles.page}>
         <header className={styles.head}>
-        <div>
-            <p className={styles.eyebrow}>Race replay</p>
-            <h1 className={styles.title}>
-            {meetingName ?? `Session #${sessionKey}`} - {sessionName}
-            </h1>
+        <div className={styles.headLeft}>
+            <div>
+                <p className={styles.eyebrow}>Race replay</p>
+                <h1 className={styles.title}>
+                {meetingName ?? `Session #${sessionKey}`} - {sessionName}
+                </h1>
+            </div>
+            <Link href={`/races/${sessionKey}/telemetry`} className={styles.linkButton}>Телеметрія</Link>
         </div>
-        {/* TODO: lap counter — current lap / total from replay cursor */}
         <LapCounter completedLaps={completedLaps} sessionStartMs={sessionStartMs} totalLaps={totalLaps}/>
         </header>
 
