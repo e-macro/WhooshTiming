@@ -52,7 +52,6 @@ export default function TelemetryChart({
     }))
     const seriesStyle = (color?: string) => color ? ({ "--trace-color": color } as React.CSSProperties) : undefined
 
-
     return (
         <section
             className={`card ${styles.wrap}`}
