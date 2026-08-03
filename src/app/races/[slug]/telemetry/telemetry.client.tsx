@@ -108,18 +108,17 @@ export default function TelemetryClient({ sessionKey }: Props) {
                     ))}
                 </h1>
             </div>
-            <div className={styles.controls}>
-                {/* <select value={activeDrivers[0] ?? ''} onChange={(e) => {
-                        setDriverNumbers([Number(e.target.value)])
-                        setLapNumber(null)
+            <select value={activeLap ?? ''} onChange={(e) => {
+                        setLapNumber(Number(e.target.value))
                         }}
                         className={styles.select}
                     >
-                    {drivers.data!.map((d) => (<option value={d.driver_number} key={d.driver_number}>
-                        {d.name_acronym} #{d.driver_number}
-                    </option>)
-                )}
-                </select> */}
+                    {driverLaps.map((l) => (
+                        <option value={l.lap_number} key={l.lap_number}>
+                            LAP {l.lap_number}
+                        </option>
+                    ))}
+                </select>
                 <div className={styles.chips}>
                     {drivers.data!.map(d => {
                         const selected = activeDrivers.includes(d.driver_number)
@@ -137,18 +136,6 @@ export default function TelemetryClient({ sessionKey }: Props) {
                         )
                     })}
                 </div>
-                <select value={activeLap ?? ''} onChange={(e) => {
-                        setLapNumber(Number(e.target.value))
-                        }}
-                        className={styles.select}
-                    >
-                    {driverLaps.map((l) => (
-                        <option value={l.lap_number} key={l.lap_number}>
-                            LAP {l.lap_number}
-                        </option>
-                    ))}
-                </select>
-            </div>
         </div>
         <div className={styles.charts}>
             <TelemetryChart

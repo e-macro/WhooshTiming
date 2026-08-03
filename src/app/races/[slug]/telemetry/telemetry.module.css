@@ -28,12 +28,6 @@
   font-weight: 700;
 }
 
-.controls {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
 /* Native selects inherit the OS look, which fights the dark theme —
    restyle them and keep the arrow via appearance: none + a background glyph. */
 .select {
