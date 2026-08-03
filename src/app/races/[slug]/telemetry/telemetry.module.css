@@ -1,0 +1,122 @@
+.page {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.eyebrow {
+  font-family: var(--font-data);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-dim);
+}
+
+.title {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Native selects inherit the OS look, which fights the dark theme —
+   restyle them and keep the arrow via appearance: none + a background glyph. */
+.select {
+  appearance: none;
+  font-family: var(--font-data);
+  font-size: 13px;
+  color: var(--text);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--squircle-sm);
+  padding: 8px 30px 8px 12px;
+  cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, var(--text-dim) 50%),
+                    linear-gradient(135deg, var(--text-dim) 50%, transparent 50%);
+  background-position: right 14px center, right 9px center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+
+.select:hover {
+  border-color: var(--text-faint);
+}
+
+/* Driver toggles: compact chips instead of twenty checkboxes.
+   --team-color comes from the driver's team_colour on each button. */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  position: relative;
+  font-family: var(--font-data);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--squircle-sm);
+  padding: 6px 10px 6px 16px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+/* Team colour bar on the left edge — the same visual anchor as the timing rows */
+.chip::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--team-color, var(--text-faint));
+  opacity: 0.4;
+}
+
+.chip:hover {
+  color: var(--text-dim);
+  border-color: var(--text-faint);
+}
+
+.chipActive {
+  color: var(--text);
+  background: var(--surface-raised);
+  border-color: var(--team-color, var(--accent));
+}
+
+.chipActive::before {
+  opacity: 1;
+}
+
+.meta {
+  font-family: var(--font-data);
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.charts {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}

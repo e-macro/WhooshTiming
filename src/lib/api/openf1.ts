@@ -6,6 +6,7 @@ import {
   type RaceControl,
   type Stint,
   type Location,
+  type CarData,
 } from "@/lib/types/openf1";
 
 const BASE = "https://api.openf1.org/v1";
@@ -60,13 +61,23 @@ export const openf1 = {
       driver_number: driverNumber,
       'date>': dateFrom,
       'date<': dateTo
-  }),
+    }
+  ),
   locationWindow: (sessionKey: number, from: string, to: string) => 
     get<Location>('location', {
       session_key: sessionKey,
       'date>': from,
       'date<': to
-    })
+    }
+  ),
+  carData: (sessionKey: number, driverNumber: number, dateFrom: string, dateTo: string) =>
+    get<CarData>('car_data', {
+      session_key: sessionKey,
+      driver_number: driverNumber,
+      'date>': dateFrom,
+      'date<': dateTo
+    }
+  ),
   // NOTE: /v1/location is huge (~0.5M records per race).
   // Fetch in time windows (date>=...&date<=...) — never all at once.
 };

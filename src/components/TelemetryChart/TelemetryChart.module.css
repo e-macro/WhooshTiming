@@ -1,0 +1,206 @@
+.wrap {
+  padding: 14px 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* min-height reserves room for the hover readouts (15px) so the card doesn't
+   grow the moment the pointer enters the plot. */
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 22px;
+}
+
+.label {
+  font-family: var(--font-data);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+}
+
+.unit {
+  font-family: var(--font-data);
+  font-size: 10px;
+  color: var(--text-faint);
+}
+
+.info {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.body {
+  display: flex;
+  gap: 10px;
+}
+
+/* Axis labels live in HTML, not inside the SVG: the plot is stretched with
+   preserveAspectRatio="none", which would distort any text drawn in it. */
+.yAxis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  width: 38px;
+  flex-shrink: 0;
+  padding-bottom: 18px; /* keep in step with the x-axis row below the plot */
+  font-size: 10px;
+  color: var(--text-faint);
+}
+
+.plot {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Anchor for the hover dot: must wrap ONLY the svg. If the overlay were
+   positioned against .plot (svg + x-axis row), every percentage would be
+   stretched by the axis height and the dot would sit progressively too low. */
+.plotArea {
+  position: relative;
+}
+
+.svg {
+  width: 100%;
+  height: 280px;
+  display: block;
+}
+
+.grid {
+  stroke: var(--border);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Sector boundaries and other vertical guides */
+.marker {
+  stroke: var(--text-faint);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+  vector-effect: non-scaling-stroke;
+}
+
+/* fill:none is the whole difference between a line chart and a black blob —
+   polyline fills by default. non-scaling-stroke keeps the line 2px thick no
+   matter how far the viewBox is stretched to fit the container. */
+/* Colour comes from --trace-color when the caller sets it, otherwise falls back
+   to the default. Using a custom property instead of an inline `stroke` keeps
+   one source for everything tinted by the series — the line today, the hover
+   dot and the legend swatch later. */
+.trace {
+  fill: none;
+  stroke: var(--trace-color, var(--time-fastest));
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Teammates share a team colour — the second one is dashed so the two traces
+   stay tellable apart. */
+.traceDashed {
+  stroke-dasharray: 6 5;
+}
+
+/* Hover readout in the header — tinted with the series colour */
+/* Legend entry: colour swatch + acronym, plus the reading when hovering. */
+.legendItem {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+/* A short bar that mimics the trace: solid, or dashed with the same rhythm
+   as stroke-dasharray on the line itself. */
+.swatch {
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--trace-color, var(--time-fastest));
+  align-self: center;
+  flex-shrink: 0;
+}
+
+.swatchDashed {
+  background: repeating-linear-gradient(
+    to right,
+    var(--trace-color, var(--time-fastest)) 0 5px,
+    transparent 5px 9px
+  );
+}
+
+.legendLabel {
+  font-family: var(--font-data);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+
+/* Per-series reading — tinted with that series' colour. */
+.value {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--trace-color, var(--time-fastest));
+}
+
+/* The moment under the cursor belongs to no series, so it stays neutral. */
+.time {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+
+/* Vertical crosshair: a straight line survives uneven stretching, so it can
+   stay inside the SVG (unlike the dot). */
+.cursor {
+  stroke: var(--text-dim);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px; /* centre on the coordinate */
+  border-radius: 50%;
+  background: var(--trace-color, var(--time-fastest));
+  box-shadow: 0 0 0 2px var(--surface);
+  pointer-events: none;
+}
+
+.xAxis {
+  position: relative;
+  height: 18px;
+  font-size: 10px;
+  color: var(--text-faint);
+}
+
+.xStart {
+  position: absolute;
+  left: 0;
+  top: 4px;
+}
+
+.xEnd {
+  position: absolute;
+  right: 0;
+  top: 4px;
+}
+
+/* Positioned by percentage so the label tracks the marker line as the plot
+   stretches; translateX(-50%) centres it on the line. */
+.xMarker {
+  position: absolute;
+  top: 4px;
+  transform: translateX(-50%);
+  color: var(--text-dim);
+}

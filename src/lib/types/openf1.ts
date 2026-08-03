@@ -133,3 +133,16 @@ export interface Stint {
   stint_number: number,
   tyre_age_at_start: number
 }
+
+export interface CarData {
+  brake: number,
+  date: string,
+  driver_number: number,
+  drs: number // 0, 1 - DRS OFF, 8 - DETECTED (eligible once in activation zone, 10, 12, 14 - DRS ON)
+  meeting_key: number,
+  n_gear: number,
+  rpm: number,
+  session_key: number,
+  speed: number // in km/h
+  throttle: number
+}

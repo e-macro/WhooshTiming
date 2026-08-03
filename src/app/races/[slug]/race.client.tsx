@@ -1,8 +1,8 @@
 "use client";
 
-import styles from "./race.module.css";
 import { useQuery } from "@tanstack/react-query";
-import { ApiError, openf1 } from "@/lib/api/openf1";
+import { openf1 } from "@/lib/api/openf1";
+import QueryStateCard, { queryStateOf } from "@/components/QueryState/QueryState";
 import { useReplayStore } from "@/store/replayStore";
 import { useEffect } from "react";
 import { useReplayTick } from "@/lib/hooks/useReplayTick";
@@ -76,14 +76,7 @@ export default function RaceClient({ sessionKey }: Props) {
     enabled: !!fastestLap
   })
   const queries = [drivers, positions, laps, session, intervals, pits, driversStandings, teamsStandings, raceControl, stints];
-  const isPending = queries.some(q => q.isPending);
-  const isError = queries.some(q => q.isError);
-  const retryCount = Math.max(...queries.map(q => q.failureCount))
-  const loadingText = retryCount === 0
-    ? 'Завантажуються дані гонки'
-    : queries.some(q => q.failureReason instanceof ApiError && q.failureReason.status === 429) 
-    ? `Забагато запитів до джерела - повторюємо автоматично (спроба ${retryCount + 1})`
-    :`Джерело не відповідає - повторюємо автоматично (спроба ${retryCount + 1})`
+  const state = queryStateOf(queries)
   useReplayTick()
   useEffect(() => {
     if (!session.data?.[0] || !positions.data) {
@@ -98,27 +91,11 @@ export default function RaceClient({ sessionKey }: Props) {
     setDuration(duration);
   }, [setDuration, session.data, positions.data])
   
-  if (isPending) {
-    return (
-      <div className={styles.state} data-variant="loading" role="status">
-        <span className={styles.stateBadge}>
-          <span className={styles.stateDot} />
-          Loading session
-        </span>
-        <p className={styles.stateText}>{loadingText}</p>
-      </div>
-    );
+  if (state.isPending) {
+    return <QueryStateCard variant="loading" text={state.loadingText} />
   }
-  if (isError) {
-    return (
-      <div className={styles.state} data-variant="error" role="alert">
-        <span className={styles.stateBadge}>
-          <span className={styles.stateDot} />
-          Data error
-        </span>
-        <p className={styles.stateText}>Ох йойки! Щось пішло не так. Скоро вирішимо проблему!</p>
-      </div>
-    );
+  if (state.isError) {
+    return <QueryStateCard variant="error" text="Ох йойки! Щось пішло не так. Скоро вирішимо проблему!" />
   }
   // Invariant: guards above returned for any pending/error query,
   // so every .data below is defined.
