@@ -36,7 +36,11 @@ export default function TelemetryClient({ sessionKey }: Props) {
         queryFn: () => openf1.laps(Number(sessionKey)),
     })
 
-    const activeDrivers = driverNumbers ?? (drivers.data?.[0] ? [drivers.data?.[0]?.driver_number] : [])
+    const numbersWithLaps = new Set(
+        (laps.data ?? []).filter(l => l.lap_duration !== null).map(l => l.driver_number)
+    )
+    const driversWithLaps = (drivers.data ?? []).filter(d => numbersWithLaps.has(d.driver_number))
+    const activeDrivers = driverNumbers ?? (driversWithLaps[0] ? [driversWithLaps[0].driver_number] : [])
     const toggleDriver = (d: number) => {
         const selected = activeDrivers.includes(d)
         if(selected && activeDrivers?.length === 1) {
@@ -131,6 +135,7 @@ export default function TelemetryClient({ sessionKey }: Props) {
                             onClick={() => toggleDriver(d.driver_number)}
                             className={`${styles.chip} ${selected ? styles.chipActive : ""}`}
                             style={{ "--team-color": `#${d.team_colour}` } as React.CSSProperties}
+                            disabled={!numbersWithLaps.has(d.driver_number)}
                             >
                                 {d.name_acronym}
                             </button>

@@ -88,9 +88,20 @@
   opacity: 0.4;
 }
 
-.chip:hover {
+.chip:hover:not(:disabled) {
   color: var(--text-dim);
   border-color: var(--text-faint);
+}
+
+/* Entered in the session but with no timing data — visible, so the roster
+   stays complete, but not selectable. */
+.chip:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.chip:disabled::before {
+  background: var(--text-faint);
 }
 
 .chipActive {
