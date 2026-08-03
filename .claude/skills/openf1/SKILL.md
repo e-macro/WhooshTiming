@@ -59,6 +59,20 @@ spelling.
 | `car_data` | ~3.6 Hz | `speed`, `throttle` (real 0–100 %), `brake` (**binary 0/100, not pressure**), `drs` (coded), `n_gear`, `rpm`. One lap ≈ 300 records. |
 | `championship_drivers` / `championship_teams` | beta | Query by `session_key`. Gives `points_start` / `points_current` — no need to aggregate `session_result` yourself. |
 
+## Endpoints do not cover the same set of drivers
+
+**Never assume that a driver listed by one endpoint appears in another.** `/v1/drivers` is the
+*entry list*, not the set of drivers with data:
+
+- China 2026 (`11245`) lists 22 drivers, but only **18** have any lap with a `lap_duration`;
+  driver #1 — the *first* entry returned — has no lap records at all (`404`).
+- Monaco 2026 (`11299`) has `location` for some drivers and time windows and not others.
+- `position` records exist for retired cars long after they stop (classification reshuffles).
+
+Consequence: any "pick the first driver" default must be taken from the **intersection** with the
+data you actually need, not from `drivers[0]`. Drivers outside that intersection should be shown
+but disabled, so the roster stays honest.
+
 ## Data quirks that caused real bugs
 
 - **`(0,0,0)` in `location` is a sentinel**, not a position: it means "no signal". Retired cars
