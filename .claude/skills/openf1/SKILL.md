@@ -75,6 +75,11 @@ spelling.
   count scales with lap duration).
 - **Sector durations are lengths, not marks.** The S2/S3 boundary is
   `duration_sector_1 + duration_sector_2`, cumulative.
+- **`location` coverage can be patchy within a session.** Monaco 2026 (`11299`) returns 200 for
+  some windows and **404 for most**, including the fastest-lap window — so a session that clearly
+  has location data can still fail for the exact slice you ask for. Treat a 404 here as "no data",
+  not as an error worth retrying, and make sure the UI can tell "request failed" apart from "still
+  loading": `?? []` collapses both into an empty array and leaves the map spinning forever.
 
 ## Reference sessions for testing
 
