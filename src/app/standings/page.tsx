@@ -4,6 +4,7 @@ import { openf1 } from "@/lib/api/openf1";
 import styles from "./standings.module.css";
 import { findLastPastSession } from "@/lib/models/race";
 import { parseSeason, SEASONS } from "@/lib/seasons";
+import type { Metadata } from "next";
 
 type Props = {
   searchParams: Promise<{ season?: string }>
@@ -66,6 +67,16 @@ function DriverAvatar({ row }: { row: DriverStandingsRow }) {
     </span>
   );
 }
+
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  const { season } = await searchParams
+  const validSeason = parseSeason(season)
+  return {
+    title: `Залік · сезон ${validSeason}`,
+    description: `Залік Чемпіонату Пілотів та Чемпіонату Кубку Конструкторів за сезон ${validSeason} року`,
+  }
+}
+
 
 function DriversTable({ rows }: { rows: DriverStandingsRow[] }) {
   return (

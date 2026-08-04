@@ -8,10 +8,25 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  title: "ВЖЖЖТаймінг — Повтори F1 гонок",
+  metadataBase: new URL('https://whoosh-timing.vercel.app'),
+  title: { 
+    default: "ВЖЖЖТаймінг — Повтори F1 гонок",
+    template: '%s · ВЖЖЖТаймінг',
+  },
   description:
-    "Replay any Formula 1 session with live-style timing, theoretical standings and track data.",
+    "Переграй будь-яку сесію Formula 1 з таймінгами як наживо, теоретичними заліками та даними траси.",
+    openGraph: {
+    type: 'website',
+    url: 'https://whoosh-timing.vercel.app',
+    },
+  twitter: {
+    card: 'summary_large_image',
+    },
 };
+
+
+
+
 
 export default function RootLayout({
   children,

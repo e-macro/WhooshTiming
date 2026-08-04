@@ -5,12 +5,20 @@ import type { Session } from "@/lib/types/openf1";
 import { toRaceListItem, type RaceListItem } from "@/lib/models/race";
 import Link from "next/link";
 import { parseSeason, SEASONS } from "@/lib/seasons";
+import type { Metadata } from "next";
 
 type Props = {
   searchParams: Promise<{ season?: string }>
 }
 
-
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  const { season } = await searchParams
+  const validSeason = parseSeason(season)
+  return {
+    title: `Гонки · сезон ${validSeason}`,
+    description: `Обирай будь-яку гонку сезона ${validSeason} року`,
+  }
+}
 
 export default async function RacesPage({ searchParams }: Props) {
   const { season } = await searchParams
