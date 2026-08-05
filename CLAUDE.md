@@ -112,6 +112,28 @@ Core idea — **the UI never knows whether data is a replay or real live**:
 - `/races/[slug]/telemetry` — N-driver comparison: speed / throttle / brake, shared hover
   crosshair, sector markers, hand-rolled SVG charts (`lib/telemetry/chart.ts`)
 - `/standings` — full season standings, drivers + constructors
+- Metadata on every route (`generateMetadata`) + `not-found.tsx`, shared OG image
+
+## Metadata
+
+- Every route exports `generateMetadata` — dynamic ones build the title from the session
+  (`circuit_short_name`, `year`, `session_name`). `not-found.tsx` exports static `metadata`; Next
+  splices it into the same chain, so the root `title.template` applies there too.
+- **Metadata blocks replace, not merge.** A child that declares `openGraph` overwrites the parent's
+  block *entirely*. This bit twice: a leftover `og:title` from another project leaked onto every
+  page, and later a per-page `openGraph: { url }` silently deleted `og:image` and `og:type`
+  everywhere. So: **never set `og:title` / `og:description` at the root** — leave them empty and
+  Next fills them from each page's own `title` / `description`. Canonical URLs belong in
+  `alternates`, which does not clobber `openGraph`.
+- OG image is the **file convention** `src/app/opengraph-image.png` — one shared site thumbnail,
+  deliberately not per-page. Next emits the absolute URL and reads the real dimensions from the
+  file, which a hand-written `images: [...]` block got wrong.
+- **Metadata is UI copy → Ukrainian** (the page declares `lang="uk"`). Names coming from the API
+  stay English — they are proper nouns, same rule as broadcast jargon.
+- Verify metadata by looking at the output, never by reading the source:
+  `curl -s localhost:3000/races/9636 | grep -o '<meta property="og:[^>]*>'`.
+- Known: `notFound()` returns HTTP **200** with the correct 404 body (Next 16.2.12, dev and prod
+  alike; a page whose only statement is `notFound()` behaves the same — not our code).
 
 ## OpenF1 API
 
