@@ -87,6 +87,10 @@ but disabled, so the roster stays honest.
   unique** coordinates; HU-2025 (`9928`) on the same circuit: 297/297. Hence `hasUsableOutline`
   gates the track map on the **ratio** of unique points (ratio, not an absolute count — point
   count scales with lap duration).
+- **The highest `lap_number` in the data was never completed by anyone.** Spa 2026 (`11334`): raw
+  max is **45**, max with a non-null `lap_duration` is **44** — the leader started lap 45 and the
+  session ended. So any "list of laps" UI must be built from *completed* laps, not from the raw
+  range. Trimming the last element instead is a positional hack that breaks when the count differs.
 - **Sector durations are lengths, not marks.** The S2/S3 boundary is
   `duration_sector_1 + duration_sector_2`, cumulative.
 - **`location` coverage can be patchy within a session.** Monaco 2026 (`11299`) returns 200 for
@@ -100,8 +104,9 @@ but disabled, so the roster stays honest.
 - **Interlagos 2024 (`9636`)** — wet chaos: VSC, SC, red flag, retirements. Exercises every track
   status and DNF path.
 - **Hungaroring 2026 (`11342`)** — degraded location feed; use to test the outline quality guard.
-- **Spa 2026 (`11334`)** — Russell crashed on lap 1 with zero completed laps; the case that broke
-  the original time-based DNF logic.
+- **Spa 2026 (`11334`)** — the retirement spread, useful for any "is this driver available at lap
+  N" logic: RUS #63 zero completed laps (broke the original time-based DNF logic), PER #11 out
+  after lap 13, STR #18 after 25, ALO #14 after 42, BOT #77 after 43, everyone else 44.
 
 ## Window loading pattern
 
