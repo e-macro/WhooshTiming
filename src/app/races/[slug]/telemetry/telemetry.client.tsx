@@ -48,19 +48,29 @@ export default function TelemetryClient({ sessionKey }: Props) {
         } 
         setDriverNumbers(selected ? activeDrivers.filter(n => n !== d) : [...activeDrivers, d])
     }
+    const lapNumbers = new Set<number>()
+    for (const lap of laps.data ?? []) {
+        if (lap.lap_duration === null) {
+            continue
+        }
+        lapNumbers.add(lap.lap_number)
+    }
+    const sortedLapNumbers = Array.from(lapNumbers).sort((a, b) => a - b)
     const driverLaps = (laps.data ?? []).filter((l): l is CompletedLap => l.driver_number === activeDrivers[0] && l.lap_duration !== null)
     const activeLap = lapNumber ?? findFastestLap(driverLaps)?.lap_number
+    const lapByDriver = new Map((laps.data ?? []).filter((l): l is CompletedLap => l.lap_number === activeLap && l.lap_duration !== null).map(i => [i.driver_number, i]))
     const entries: TelemetryEntry[] = []
     const seen = new Set<string>()
     for (const num of activeDrivers) {
         const driver = drivers.data?.find(d => d.driver_number === num)
-        const lap = (laps.data ?? []).find((l): l is CompletedLap => l.driver_number === num && l.lap_number === activeLap && l.lap_duration !== null)
+        const lap = lapByDriver.get(num)
         if(!driver || !lap) continue
         const color = `#${driver.team_colour}`
         const dashed = seen.has(color)
         seen.add(color)
         entries.push({ driver, lap, color, dashed })
     }
+
     const results = useQueries({
         queries: entries.map(({ driver, lap }) => ({
             queryKey: ['carData', sessionKey, driver.driver_number, lap.lap_number],
@@ -106,10 +116,10 @@ export default function TelemetryClient({ sessionKey }: Props) {
                 <p className={styles.eyebrow}>Телеметрія</p>
                 <h1 className={styles.title}>
                     LAP {activeLap} -
-                    {entries.map(e => (
+                    {entries.map((e, i) => (
                         <span
                         key={e.driver.driver_number}
-                        > {e.driver.name_acronym} #{e.driver.driver_number} {formatLapTime(e.lap.lap_duration)}</span>
+                        > {i > 0 && " vs "}{e.driver.name_acronym} #{e.driver.driver_number} {formatLapTime(e.lap.lap_duration)}</span>
                     ))}
                 </h1>
             </div>
@@ -118,9 +128,9 @@ export default function TelemetryClient({ sessionKey }: Props) {
                         }}
                         className={styles.select}
                     >
-                    {driverLaps.map((l) => (
-                        <option value={l.lap_number} key={l.lap_number}>
-                            LAP {l.lap_number}
+                    {sortedLapNumbers.map((l) => (
+                        <option value={l} key={l}>
+                            LAP {l}
                         </option>
                     ))}
                 </select>
@@ -135,7 +145,7 @@ export default function TelemetryClient({ sessionKey }: Props) {
                             onClick={() => toggleDriver(d.driver_number)}
                             className={`${styles.chip} ${selected ? styles.chipActive : ""}`}
                             style={{ "--team-color": `#${d.team_colour}` } as React.CSSProperties}
-                            disabled={!numbersWithLaps.has(d.driver_number)}
+                            disabled={!lapByDriver.has(d.driver_number)}
                             >
                                 {d.name_acronym}
                             </button>
