@@ -16,7 +16,7 @@ export default function RaceCard({ slug, name, circuit, country, dateStart, roun
   const content = (
     <>
       <span className={styles.top}>
-        <span className={`${styles.round} tnum`}>R{String(round).padStart(2, "0")}</span>
+        {round !== null && <span className={`${styles.round} tnum`}>R{String(round).padStart(2, "0")}</span>}
         {badge && <span className={styles.badge}>{badge}</span>}
       </span>
       <h2 className={styles.name}>{name}</h2>

@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import type { Meeting, Session } from "../types/openf1";
-import { findLastPastSession, toRaceListItem } from "./race";
+import { buildRaceList, findLastPastSession, toRaceListItem } from "./race";
 
 const makeMeeting = (overrides: Partial<Meeting> = {}): Meeting => ({
     meeting_key: 1,
@@ -37,15 +37,15 @@ const FUTURE_DATE = "2026-08-01T00:00:00+00:00";  // після NOW
 
 describe('toRaceListItem', () => {
     it('marks race as past when its date is before now', () => {
-        const item = toRaceListItem(makeMeeting(), makeSession({date_start: PAST_DATE}), 1, NOW);
+        const item = toRaceListItem(makeMeeting(), makeSession({date_start: PAST_DATE}), NOW);
         expect(item.status).toBe('past')
     })
     it('marks race as upcoming when its date is after NOW', () => {
-        const item = toRaceListItem(makeMeeting(), makeSession({date_start: FUTURE_DATE}), 1, NOW);
+        const item = toRaceListItem(makeMeeting(), makeSession({date_start: FUTURE_DATE}), NOW);
         expect(item.status).toBe('upcoming')
     })
     it('marks race as cancelled with date is after NOW', () => {
-        const item = toRaceListItem(makeMeeting({ is_cancelled: true }), makeSession({date_start: FUTURE_DATE}), 1, NOW);
+        const item = toRaceListItem(makeMeeting({ is_cancelled: true }), makeSession({date_start: FUTURE_DATE}), NOW);
         expect(item.status).toBe('cancelled')
     })
 })
@@ -62,5 +62,73 @@ describe('findLastPastSession', () => {
     })
     it('returns null for empty array', () => {
         expect(findLastPastSession([], NOW)).toBe(null)
+    })
+})
+
+describe('buildRaceList', () => {
+    const sessions = [
+        makeSession(),
+        makeSession({meeting_key: 2, session_key: 2}),
+        makeSession({meeting_key: 3, session_key: 3}),
+        makeSession({meeting_key: 4, session_key: 4}),
+        makeSession({meeting_key: 5, session_key: 5})
+    ]
+    it('while race in middle is cancelled, its round = null, next race round is after previous non-cancelled race', () => {
+        const meetings = [
+            makeMeeting(),
+            makeMeeting({meeting_key: 2}),
+            makeMeeting({meeting_key: 3, is_cancelled: true}),
+            makeMeeting({meeting_key: 4}),
+            makeMeeting({meeting_key: 5}),
+        ]
+        const res = buildRaceList(sessions, meetings, NOW)
+        expect(res.map(r => r.round)).toEqual([1, 2, null, 3, 4])
+    })
+    it('first race is cancelled, second race has round = 1', () => {
+        const meetings = [
+            makeMeeting({is_cancelled: true}),
+            makeMeeting({meeting_key: 2}),
+            makeMeeting({meeting_key: 3}),
+            makeMeeting({meeting_key: 4}),
+            makeMeeting({meeting_key: 5}),
+        ]
+        const res = buildRaceList(sessions, meetings, NOW)
+        expect(res.map(r => r.round)).toEqual([null, 1, 2, 3, 4])
+    })
+    it('returns sorted by date races list', () => {
+        const meetings = [
+            makeMeeting(),
+            makeMeeting({meeting_key: 2, date_start: '2025-12-01T00:00:00+00:00'}),
+            makeMeeting({meeting_key: 3, date_start: '2026-02-01T00:00:00+00:00'}),
+            makeMeeting({meeting_key: 4, date_start: '2026-04-01T00:00:00+00:00'}),
+            makeMeeting({meeting_key: 5, date_start: '2026-03-01T00:00:00+00:00'}),
+        ]
+        const res = buildRaceList(sessions, meetings, NOW)
+        expect(res.map(r => r.dateStart)).toEqual([
+            '2025-12-01',
+            '2026-01-01',
+            '2026-02-01',
+            '2026-03-01',
+            '2026-04-01'
+        ])
+    })
+    it('builder ignores meeting with no corresponding session with its meeting key', () => {
+        const meetings = [
+            makeMeeting(),
+            makeMeeting({meeting_key: 6, date_start: '2025-12-01T00:00:00+00:00'}),
+            makeMeeting({meeting_key: 3, date_start: '2026-02-01T00:00:00+00:00'}),
+            makeMeeting({meeting_key: 4, date_start: '2026-04-01T00:00:00+00:00'}),
+            makeMeeting({meeting_key: 5, date_start: '2026-03-01T00:00:00+00:00'}),
+        ]
+        const res = buildRaceList(sessions, meetings, NOW)
+        expect(res.map(r => r.dateStart)).toEqual([
+            '2026-01-01',
+            '2026-02-01',
+            '2026-03-01',
+            '2026-04-01'
+        ])
+        expect(res.map(r => r.round)).toEqual([
+            1, 2, 3, 4
+        ])
     })
 })

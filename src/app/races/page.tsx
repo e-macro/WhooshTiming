@@ -1,8 +1,7 @@
 import RaceCard from "@/components/RaceCard/RaceCard";
 import styles from "./races.module.css";
 import { openf1 } from "@/lib/api/openf1";
-import type { Session } from "@/lib/types/openf1";
-import { toRaceListItem, type RaceListItem } from "@/lib/models/race";
+import { buildRaceList } from "@/lib/models/race";
 import Link from "next/link";
 import { parseSeason, SEASONS } from "@/lib/seasons";
 import type { Metadata } from "next";
@@ -29,18 +28,7 @@ export default async function RacesPage({ searchParams }: Props) {
   const nowMs = Date.now()
   const cacheOpts = validSeason === new Date(nowMs).getFullYear() ? { revalidate: 3600 } : undefined;
   const [meetings, sessions] = await Promise.all([openf1.meetings(validSeason, cacheOpts), openf1.raceSessions(validSeason, cacheOpts)])
-  const sessionByMeeting = new Map<number, Session>()
-  for (const session of sessions) {
-    sessionByMeeting.set(session.meeting_key, session)
-  }
-  const races: RaceListItem[] = []
-  for (const meeting of meetings) {
-    const session = sessionByMeeting.get(meeting.meeting_key)
-    if (!session) {
-      continue
-    }
-    races.push(toRaceListItem(meeting, session, races.length+1, nowMs))
-  }
+  const races = buildRaceList(sessions, meetings, nowMs)
   const nextSlug = races.find(r => r.status === 'upcoming')?.slug
   return (
     <section className={styles.page}>

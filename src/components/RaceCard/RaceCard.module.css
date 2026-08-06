@@ -30,9 +30,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  min-height: 18px;
 }
 
+/* Cancelled races have no round number, so the badge can be the only child
+   in .top — auto margin keeps it right-aligned instead of letting
+   space-between pull it to the left edge. */
 .badge {
+  margin-left: auto;
   font-family: var(--font-data);
   font-size: 10px;
   text-transform: uppercase;
